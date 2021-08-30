@@ -2,16 +2,16 @@ import React from "react";
 import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Button from "../components/Button";
+import Title from "../components/Title";
 import notify from "../helpers/notify";
-
-type ActiveType = "Product" | "Recipe" | null;
+import ActiveFluxType from "../types/ActiveFluxType";
 
 export default function Home() {
-  const [activeType, setActiveType] = useState<ActiveType>(null);
+  const [activeType, setActiveType] = useState<ActiveFluxType>(null);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>O que você busca?</Text>
+      <Title centralized>O que você busca?</Title>
 
       <View style={styles.buttonsContainer}>
         <TouchableOpacity

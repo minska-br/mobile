@@ -2,6 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Button from "../components/Button";
+import Container from "../components/Container";
 import Title from "../components/Title";
 import notify from "../helpers/notify";
 import ActiveFluxType from "../types/ActiveFluxType";
@@ -10,7 +11,7 @@ export default function Home() {
   const [activeType, setActiveType] = useState<ActiveFluxType>(null);
 
   return (
-    <View style={styles.container}>
+    <Container>
       <Title centralized>O que você busca?</Title>
 
       <View style={styles.buttonsContainer}>
@@ -48,25 +49,11 @@ export default function Home() {
       >
         Continuar
       </Button>
-    </View>
+    </Container>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 36,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    fontFamily: "Roboto",
-    fontSize: 48,
-    textAlign: "center",
-    color: "#333",
-    fontWeight: "bold",
-  },
   buttonsContainer: {
     marginTop: "20%",
     marginBottom: "30%",

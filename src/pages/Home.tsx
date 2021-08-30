@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import Button from "../components/Button";
 import notify from "../helpers/notify";
 
 type ActiveType = "Product" | "Recipe" | null;
@@ -37,8 +38,7 @@ export default function Home() {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity
-        style={styles.button}
+      <Button
         onPress={() => {
           setActiveType(null);
           notify(
@@ -46,8 +46,8 @@ export default function Home() {
           );
         }}
       >
-        <Text style={styles.buttonText}>Continuar</Text>
-      </TouchableOpacity>
+        Continuar
+      </Button>
     </View>
   );
 }
@@ -74,25 +74,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     justifyContent: "space-between",
-  },
-  button: {
-    borderWidth: 1,
-    borderColor: "#898989",
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 4,
-    width: "100%",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    margin: 4,
-  },
-  buttonText: {
-    fontFamily: "Roboto",
-    fontSize: 20,
-    color: "#333",
-    fontWeight: "bold",
-    textTransform: "uppercase",
   },
   squareButton: {
     backgroundColor: "#898989",

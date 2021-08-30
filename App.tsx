@@ -1,12 +1,12 @@
 import React from "react";
 
-import Home from "./src/pages/Home";
 import { RootSiblingParent } from "react-native-root-siblings";
+import Routes from "./src/routes";
 
 export default function Main() {
   return (
     <RootSiblingParent>
-      <Home />
+      <Routes />
     </RootSiblingParent>
   );
 }

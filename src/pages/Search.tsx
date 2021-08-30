@@ -8,13 +8,15 @@ import Container from "../components/Container";
 import Subtitle from "../components/Subtitle";
 import Title from "../components/Title";
 import recipes from "../constants/recipes";
+import RoutesEnum from "../enums/routes";
 import notify from "../helpers/notify";
 
-export default function Search() {
+export default function Search({ route, navigation }: any) {
   const inputref = useRef<TextInput>(null);
   const [inputValue, setInputValue] = useState("");
   const randomRecipe = recipes[Math.floor(Math.random() * recipes.length)];
-
+  const { activeFluxType } = route.params;
+  const activeFluxText = activeFluxType === "Recipe" ? "Receita" : "Produto";
   const focusOnInputField = () => inputref.current?.focus();
 
   const openKeyboardOnLoad = () => {
@@ -24,9 +26,13 @@ export default function Search() {
 
   useEffect(openKeyboardOnLoad, []);
 
+  const handeSearch = () => {
+    notify(`Search: ${inputValue}`);
+  };
+
   return (
     <Container>
-      <Subtitle>Receita</Subtitle>
+      <Subtitle>{activeFluxText}</Subtitle>
       <Title>Digite o que deseja procurar</Title>
       <TextInput
         ref={inputref}
@@ -35,12 +41,7 @@ export default function Search() {
         onChangeText={(text) => setInputValue(text)}
         value={inputValue}
       ></TextInput>
-      <Button
-        disabled={inputValue.length <= 0}
-        onPress={() => {
-          notify(`Search: ${inputValue}`);
-        }}
-      >
+      <Button disabled={inputValue.length <= 0} onPress={handeSearch}>
         Continuar
       </Button>
     </Container>

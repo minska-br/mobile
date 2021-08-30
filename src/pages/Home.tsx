@@ -4,11 +4,21 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Button from "../components/Button";
 import Container from "../components/Container";
 import Title from "../components/Title";
+import RoutesEnum from "../enums/routes";
 import notify from "../helpers/notify";
 import ActiveFluxType from "../types/ActiveFluxType";
 
-export default function Home() {
-  const [activeType, setActiveType] = useState<ActiveFluxType>(null);
+export default function Home({ navigation }: any) {
+  const [activeFluxType, setActiveFluxType] = useState<ActiveFluxType>(null);
+
+  const handleButtonPress = () => {
+    if (activeFluxType) {
+      navigation.navigate(RoutesEnum.Search, { activeFluxType });
+      return;
+    }
+
+    notify(`Selecione um item para continuar.`);
+  };
 
   return (
     <Container>
@@ -17,38 +27,29 @@ export default function Home() {
       <View style={styles.buttonsContainer}>
         <TouchableOpacity
           style={
-            activeType === "Product"
+            activeFluxType === "Product"
               ? styles.squareButtonSelected
               : styles.squareButton
           }
           activeOpacity={0.8}
-          onPress={() => setActiveType("Product")}
+          onPress={() => setActiveFluxType("Product")}
         >
           <Text style={styles.squareButtonText}>Produto</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={
-            activeType === "Recipe"
+            activeFluxType === "Recipe"
               ? styles.squareButtonSelected
               : styles.squareButton
           }
           activeOpacity={0.8}
-          onPress={() => setActiveType("Recipe")}
+          onPress={() => setActiveFluxType("Recipe")}
         >
           <Text style={styles.squareButtonText}>Receita</Text>
         </TouchableOpacity>
       </View>
 
-      <Button
-        onPress={() => {
-          setActiveType(null);
-          notify(
-            `Item selecionado: ${activeType}\nProximo passo: criar tela de pesquisa!`
-          );
-        }}
-      >
-        Continuar
-      </Button>
+      <Button onPress={handleButtonPress}>Continuar</Button>
     </Container>
   );
 }

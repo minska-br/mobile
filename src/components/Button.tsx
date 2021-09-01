@@ -9,6 +9,7 @@ import {
 
 interface ButtonProps {
   disabled?: boolean;
+  centered?: boolean;
   onPress?: ((event: GestureResponderEvent) => void) | undefined;
 }
 
@@ -18,7 +19,7 @@ export default class Button extends React.Component<ButtonProps> {
   }
 
   render() {
-    const { disabled, onPress, children } = this.props;
+    const { disabled, centered, onPress, children } = this.props;
 
     return (
       <TouchableOpacity
@@ -26,7 +27,13 @@ export default class Button extends React.Component<ButtonProps> {
         onPress={onPress}
         disabled={disabled || false}
       >
-        <Text style={disabled ? styles.buttonTextDisabled : styles.buttonText}>
+        <Text
+          style={[
+            styles.buttonText,
+            disabled ? styles.buttonTextDisabled : null,
+            centered ? styles.buttonTextCentered : null,
+          ]}
+        >
           {children}
         </Text>
       </TouchableOpacity>
@@ -59,5 +66,8 @@ const styles = StyleSheet.create({
     color: "#BDBDBD",
     fontWeight: "bold",
     textTransform: "uppercase",
+  },
+  buttonTextCentered: {
+    textAlign: "center",
   },
 });

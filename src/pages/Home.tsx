@@ -14,6 +14,7 @@ export default function Home({ navigation }: any) {
   const handleButtonPress = () => {
     if (activeFluxType) {
       navigation.navigate(RoutesEnum.Search, { activeFluxType });
+      setTimeout(() => setActiveFluxType(null), 500);
       return;
     }
 

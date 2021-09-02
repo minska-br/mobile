@@ -2,15 +2,30 @@ import React from "react";
 
 import { StyleSheet, Text } from "react-native";
 
-export default class Subtitle extends React.Component {
+interface SubtitleProps {
+  route: any;
+}
+
+export default class Subtitle extends React.Component<SubtitleProps> {
   constructor(props: any) {
     super(props);
   }
 
-  render() {
-    const { children } = this.props;
+  getText() {
+    const { children, route } = this.props;
 
-    return <Text style={styles.subtitle}>{children}</Text>;
+    if (children) return children;
+
+    const activeFluxType = route.params?.activeFluxType;
+
+    if (!activeFluxType) return "Subtitle";
+
+    const isRecipe = activeFluxType === "Recipe";
+    return isRecipe ? "Receita" : "Produto";
+  }
+
+  render() {
+    return <Text style={styles.subtitle}>{this.getText()}</Text>;
   }
 }
 

@@ -1,72 +1,61 @@
 import React from "react";
 import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import Button from "../components/Button";
+import Container from "../components/Container";
+import Title from "../components/Title";
+import RoutesEnum from "../enums/routes";
 import notify from "../helpers/notify";
+import ActiveFluxType from "../types/ActiveFluxType";
 
-type ActiveType = "Product" | "Recipe" | null;
+export default function Home({ navigation }: any) {
+  const [activeFluxType, setActiveFluxType] = useState<ActiveFluxType>(null);
 
-export default function Home() {
-  const [activeType, setActiveType] = useState<ActiveType>(null);
+  const handleButtonPress = () => {
+    if (activeFluxType) {
+      navigation.navigate(RoutesEnum.Search, { activeFluxType });
+      setTimeout(() => setActiveFluxType(null), 500);
+      return;
+    }
+
+    notify(`Selecione um item para continuar.`);
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>O que você busca?</Text>
+    <Container>
+      <Title centralized>O que você busca?</Title>
 
       <View style={styles.buttonsContainer}>
         <TouchableOpacity
           style={
-            activeType === "Product"
+            activeFluxType === "Product"
               ? styles.squareButtonSelected
               : styles.squareButton
           }
           activeOpacity={0.8}
-          onPress={() => setActiveType("Product")}
+          onPress={() => setActiveFluxType("Product")}
         >
           <Text style={styles.squareButtonText}>Produto</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={
-            activeType === "Recipe"
+            activeFluxType === "Recipe"
               ? styles.squareButtonSelected
               : styles.squareButton
           }
           activeOpacity={0.8}
-          onPress={() => setActiveType("Recipe")}
+          onPress={() => setActiveFluxType("Recipe")}
         >
           <Text style={styles.squareButtonText}>Receita</Text>
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          setActiveType(null);
-          notify(
-            `Item selecionado: ${activeType}\nProximo passo: criar tela de pesquisa!`
-          );
-        }}
-      >
-        <Text style={styles.buttonText}>Continuar</Text>
-      </TouchableOpacity>
-    </View>
+      <Button onPress={handleButtonPress}>Continuar</Button>
+    </Container>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 36,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    fontFamily: "Roboto",
-    fontSize: 48,
-    textAlign: "center",
-    color: "#333",
-    fontWeight: "bold",
-  },
   buttonsContainer: {
     marginTop: "20%",
     marginBottom: "30%",
@@ -74,25 +63,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     justifyContent: "space-between",
-  },
-  button: {
-    borderWidth: 1,
-    borderColor: "#898989",
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 4,
-    width: "100%",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    margin: 4,
-  },
-  buttonText: {
-    fontFamily: "Roboto",
-    fontSize: 20,
-    color: "#333",
-    fontWeight: "bold",
-    textTransform: "uppercase",
   },
   squareButton: {
     backgroundColor: "#898989",

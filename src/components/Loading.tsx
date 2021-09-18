@@ -3,7 +3,7 @@ import { Image, ImageBackground, StyleSheet, View } from "react-native";
 import { LoadingContext } from "../contexts/LoadingContext";
 import Container from "./Container";
 
-export default function Loadin(props: any) {
+export default function Loading(props: any) {
   const { children } = props;
   const { loadingStatus } = useContext(LoadingContext);
 

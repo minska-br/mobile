@@ -59,22 +59,20 @@ export default function Search({ route, navigation }: any) {
   useEffect(openKeyboardOnLoad, []);
 
   return (
-    <Loading>
-      <Container>
-        <Subtitle route={route} />
-        <Title>Digite o que deseja procurar</Title>
-        <TextInput
-          ref={inputref}
-          placeholder={`Ex: ${getPlaceholder()}`}
-          style={styles.searchInput}
-          onChangeText={(text) => setInputValue(text)}
-          value={inputValue}
-        ></TextInput>
-        <Button disabled={inputValue.length <= 0} onPress={handeSearch}>
-          Continuar
-        </Button>
-      </Container>
-    </Loading>
+    <Container>
+      <Subtitle route={route} />
+      <Title>Digite o que deseja procurar</Title>
+      <TextInput
+        ref={inputref}
+        placeholder={`Ex: ${getPlaceholder()}`}
+        style={styles.searchInput}
+        onChangeText={(text) => setInputValue(text)}
+        value={inputValue}
+      ></TextInput>
+      <Button disabled={inputValue.length <= 0} onPress={handeSearch}>
+        Continuar
+      </Button>
+    </Container>
   );
 }
 

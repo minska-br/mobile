@@ -1,14 +1,13 @@
 import React, { useContext } from "react";
 import { Image, ImageBackground, StyleSheet, View } from "react-native";
 import { LoadingContext } from "../contexts/LoadingContext";
-import Container from "./Container";
 
 export default function Loading(props: any) {
   const { children } = props;
   const { loadingStatus } = useContext(LoadingContext);
 
-  const loadingComponet = (
-    <Container centralized>
+  const loading = (
+    <View style={styles.loadingContainer}>
       <ImageBackground
         style={styles.imgBackground}
         resizeMode="cover"
@@ -19,15 +18,20 @@ export default function Loading(props: any) {
         style={styles.loadingIcon}
         source={require("../../assets/loading.gif")}
       />
-    </Container>
+    </View>
   );
 
-  return loadingStatus ? loadingComponet : children;
+  return loadingStatus ? loading : children;
 }
 
 const styles = StyleSheet.create({
-  loading: {
+  loadingContainer: {
     flex: 1,
+    paddingTop: 32,
+    paddingHorizontal: 36,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
   imgBackground: {
     width: "100%",

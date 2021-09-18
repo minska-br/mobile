@@ -1,6 +1,8 @@
 import React from "react";
 
-import { StyleSheet, View } from "react-native";
+import { StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Loading from "./Loading";
 
 interface ContainerProps {
   centralized?: boolean;
@@ -15,11 +17,13 @@ export default class Container extends React.Component<ContainerProps> {
     const { centralized, children } = this.props;
 
     return (
-      <View
-        style={centralized ? styles.centralizedContainer : styles.container}
-      >
-        {children}
-      </View>
+      <Loading>
+        <SafeAreaView
+          style={centralized ? styles.centralizedContainer : styles.container}
+        >
+          {children}
+        </SafeAreaView>
+      </Loading>
     );
   }
 }

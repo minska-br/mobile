@@ -7,15 +7,13 @@ import {
   FlatList,
   Text,
   TouchableOpacity,
-  View,
 } from "react-native";
 import Subtitle from "../components/Subtitle";
 import Title from "../components/Title";
 import RoutesEnum from "../enums/routes";
-import Loading from "../components/Loading";
 import fakeDelay from "../helpers/fakeDelay";
 import { LoadingContext } from "../contexts/LoadingContext";
-import { useNavigation } from "@react-navigation/native";
+import Container from "../components/Container";
 
 const mock = [
   {
@@ -98,32 +96,22 @@ export default function ResultList({ route, navigation }: any) {
   useEffect(loadList, [searchQuery]);
 
   return (
-    <Loading>
-      <View style={styles.container}>
-        <Subtitle route={route} />
-        <Title>Veja o que nós encontramos</Title>
+    <Container>
+      <Subtitle route={route} />
+      <Title>Veja o que nós encontramos</Title>
 
-        <SafeAreaView style={styles.safeAreaViewContainer}>
-          <FlatList
-            data={data}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id.toString()}
-          />
-        </SafeAreaView>
-      </View>
-    </Loading>
+      <SafeAreaView style={styles.safeAreaViewContainer}>
+        <FlatList
+          data={data}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id.toString()}
+        />
+      </SafeAreaView>
+    </Container>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 100,
-    paddingHorizontal: 36,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
   safeAreaViewContainer: {
     width: "100%",
     maxHeight: "50%",

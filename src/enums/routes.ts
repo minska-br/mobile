@@ -3,7 +3,6 @@ enum RoutesEnum {
   Search = "Search",
   ResultList = "ResultList",
   ResultDetail = "ResultDetail",
-  Loading = "Loading",
 }
 
 export default RoutesEnum;

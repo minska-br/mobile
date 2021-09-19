@@ -32,13 +32,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 32,
+    paddingBottom: 32,
     paddingHorizontal: 36,
     backgroundColor: "#fff",
-    justifyContent: "center",
   },
   centralizedContainer: {
     flex: 1,
     paddingTop: 32,
+    paddingBottom: 32,
     paddingHorizontal: 36,
     backgroundColor: "#fff",
     alignItems: "center",

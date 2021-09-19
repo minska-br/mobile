@@ -17,22 +17,25 @@ interface Detail {
 export default function ResultDetail({ route, navigation }: any) {
   const { setLoadingStatus } = useContext(LoadingContext);
   const [detail, setDetail] = useState<Detail>();
-  const { activeFluxType } = route.params;
+  const activeFluxType = route.params?.activeFluxType;
 
   const handleAnotherSearch = () => {
     navigation.navigate(RoutesEnum.Search, { activeFluxType });
   };
+
   const handleHowToCalculate = () => {
     notify(`Uma somatória de valores globalmente aceitos que 
             estão ligados a emissão de carbono presente nesse
              item é realizada.`);
   };
+
   const handleGoToHome = () => {
     navigation.navigate(RoutesEnum.Home);
     setLoadingStatus(false);
   };
 
   const getDetail = async () => {
+    setLoadingStatus(false);
     // await request sending id
 
     const isRecipe = activeFluxType === "Recipe";
@@ -50,19 +53,23 @@ export default function ResultDetail({ route, navigation }: any) {
   useEffect(loadList, []);
 
   return (
-    <Container>
-      <Subtitle route={route} />
-      <Text style={styles.emissiontext}>
-        {String(detail?.totalEmission).replace(".", ",")} tCO
-        <Text style={styles.subscribed}>2</Text>
-      </Text>
-      <Text style={styles.frequency}>(ao ano)</Text>
-      <Text style={styles.itemName}>{detail?.name}</Text>
+    <Container centralized>
+      <View style={styles.resultInfo}>
+        <Subtitle route={route} />
+        <Text style={styles.emissionText}>
+          {String(detail?.totalEmission).replace(".", ",")} tCO
+          <Text style={styles.subscribed}>2</Text>
+        </Text>
+        <Text style={styles.frequency}>(ao ano)</Text>
+        <Text style={styles.itemName}>{detail?.name}</Text>
+      </View>
       <View style={styles.buttonsGrid}>
         <Button disabled centered>
           como posso compensar essa emissão?
         </Button>
-        <Button onPress={handleAnotherSearch}>pesquisar outra receita</Button>
+        <Button onPress={handleAnotherSearch} centered>
+          pesquisar outra receita
+        </Button>
         <Button onPress={handleHowToCalculate}>como o cálculo é feito</Button>
         <Button onPress={handleGoToHome}>voltar ao inicio</Button>
       </View>
@@ -71,14 +78,18 @@ export default function ResultDetail({ route, navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  emissiontext: {
-    fontSize: 56,
-    fontWeight: "bold",
+  resultInfo: {
+    paddingTop: 24,
+    width: "100%",
+    justifyContent: "center",
+  },
+  emissionText: {
+    fontSize: 72,
     color: "#333",
-    marginTop: 48,
+    fontWeight: "bold",
   },
   subscribed: {
-    fontSize: 32,
+    fontSize: 42,
   },
   frequency: {
     fontSize: 32,
@@ -86,7 +97,7 @@ const styles = StyleSheet.create({
     color: "#bdbdbd",
   },
   itemName: {
-    fontSize: 28,
+    fontSize: 42,
     fontWeight: "bold",
     color: "#333",
     width: "100%",
@@ -95,8 +106,9 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   buttonsGrid: {
-    maxHeight: "50%",
-    flex: 1,
-    justifyContent: "space-between",
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    paddingBottom: 16,
   },
 });

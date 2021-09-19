@@ -10,6 +10,7 @@ import {
 interface ButtonProps {
   disabled?: boolean;
   centered?: boolean;
+  size?: "small" | "common" | "large";
   onPress?: ((event: GestureResponderEvent) => void) | undefined;
 }
 
@@ -20,6 +21,7 @@ export default class Button extends React.Component<ButtonProps> {
 
   render() {
     const { disabled, centered, onPress, children } = this.props;
+    const size = this.props.size ?? "common";
 
     return (
       <TouchableOpacity
@@ -30,6 +32,9 @@ export default class Button extends React.Component<ButtonProps> {
         <Text
           style={[
             styles.buttonText,
+            size === "small" ? styles.smallButton : null,
+            size === "common" ? styles.commonButton : null,
+            size === "large" ? styles.largeButton : null,
             disabled ? styles.buttonTextDisabled : null,
             centered ? styles.buttonTextCentered : null,
           ]}
@@ -50,24 +55,34 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 4,
     width: "100%",
-    padding: 16,
     margin: 4,
   },
   buttonText: {
     fontFamily: "Roboto",
-    fontSize: 20,
     color: "#333",
     fontWeight: "bold",
     textTransform: "uppercase",
   },
   buttonTextDisabled: {
     fontFamily: "Roboto",
-    fontSize: 20,
     color: "#BDBDBD",
     fontWeight: "bold",
     textTransform: "uppercase",
   },
-  buttonTextCentered: {
-    textAlign: "center",
+  buttonTextCentered: { textAlign: "center" },
+  smallButton: {
+    fontSize: 10,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  commonButton: {
+    fontSize: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  largeButton: {
+    fontSize: 20,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
   },
 });

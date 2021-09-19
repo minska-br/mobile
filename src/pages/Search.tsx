@@ -45,6 +45,7 @@ export default function Search({ route, navigation }: any) {
 
     fakeDelay(() => {
       navigateToResultList();
+      setInputValue("");
       setTimeout(() => setLoadingStatus(false), 500);
     }, 3);
   };

@@ -113,10 +113,9 @@ export default function ResultList({ route, navigation }: any) {
 
 const styles = StyleSheet.create({
   safeAreaViewContainer: {
+    flex: 1,
     width: "100%",
-    maxHeight: "50%",
     marginTop: 16,
-    paddingBottom: 16,
   },
   item: {
     justifyContent: "center",

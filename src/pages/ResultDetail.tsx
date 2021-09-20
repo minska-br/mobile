@@ -4,7 +4,6 @@ import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Button from "../components/Button";
 import Container from "../components/Container";
-import EmissionText from "../components/EmissionText";
 import Subtitle from "../components/Subtitle";
 import { LoadingContext } from "../contexts/LoadingContext";
 import RoutesEnum from "../enums/routes";
@@ -57,7 +56,10 @@ export default function ResultDetail({ route, navigation }: any) {
     <Container centralized>
       <View style={styles.resultInfo}>
         <Subtitle route={route} />
-        <EmissionText value={detail?.totalEmission ?? 0} fontSize={72} />
+        <Text style={styles.emissionText}>
+          {String(detail?.totalEmission).replace(".", ",")} tCO
+          <Text style={styles.subscribed}>2</Text>
+        </Text>
         <Text style={styles.frequency}>(ao ano)</Text>
         <Text style={styles.itemName}>{detail?.name}</Text>
       </View>

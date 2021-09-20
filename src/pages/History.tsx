@@ -62,14 +62,18 @@ import { Ionicons } from "@expo/vector-icons";
 import EmissionText from "../components/EmissionText";
 
 export default function History() {
+  const NOT_SELECTED_ID = -1;
   const [data, setData] = useState<HistoryItem[]>([]);
-  const [selectedItemId, setSelectedItemId] = useState<number>(-1);
+  const [selectedItemId, setSelectedItemId] = useState<number>(NOT_SELECTED_ID);
   const { setLoadingStatus } = useContext(LoadingContext);
+
+  const undoSelection = () => setSelectedItemId(NOT_SELECTED_ID);
 
   const deleteSelectedItem = () => {
     setLoadingStatus(true);
     const newData = data.filter((item) => item.id !== selectedItemId);
     setData(newData);
+    undoSelection();
     setLoadingStatus(false);
   };
 
@@ -100,7 +104,8 @@ export default function History() {
 
     const onPressItem = (id: number) => {
       // setLoadingStatus(true);
-      setSelectedItemId(id);
+      const newId = isSelected ? NOT_SELECTED_ID : id; // Unselect id on twice press
+      setSelectedItemId(newId);
       // fakeDelay(() => setLoadingStatus(false), 10, 5);
     };
 
@@ -151,11 +156,16 @@ export default function History() {
         keyExtractor={(item) => item.id.toString()}
       />
 
-      <View style={styles.trashButtonContainer}>
-        <TouchableOpacity style={styles.trashButton} onPress={handleTrashPress}>
-          <Ionicons name="md-trash-outline" color="white" size={30} />
-        </TouchableOpacity>
-      </View>
+      {selectedItemId !== NOT_SELECTED_ID && (
+        <View style={styles.trashButtonContainer}>
+          <TouchableOpacity
+            style={styles.trashButton}
+            onPress={handleTrashPress}
+          >
+            <Ionicons name="md-trash-outline" color="white" size={30} />
+          </TouchableOpacity>
+        </View>
+      )}
     </Container>
   );
 }

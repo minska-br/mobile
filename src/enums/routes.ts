@@ -3,6 +3,7 @@ enum RoutesEnum {
   Search = "Search",
   ResultList = "ResultList",
   ResultDetail = "ResultDetail",
+  History = "History",
 }
 
 export default RoutesEnum;

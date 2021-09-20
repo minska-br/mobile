@@ -140,8 +140,10 @@ export default function History() {
     <Container>
       <View style={styles.titleContainer}>
         <Title>Histórico</Title>
+        <Text style={styles.historySubtitle}>
+          Selecione um item caso queira deleta-lo
+        </Text>
       </View>
-      <Text>Selecione um item caso queira deleta-lo</Text>
 
       <FlatList
         data={data}
@@ -161,6 +163,10 @@ export default function History() {
 const styles = StyleSheet.create({
   titleContainer: {
     marginBottom: 32,
+  },
+  historySubtitle: {
+    color: "#777",
+    fontSize: 20,
   },
   item: {
     fontFamily: "Roboto",

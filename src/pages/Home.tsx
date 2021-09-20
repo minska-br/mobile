@@ -22,7 +22,7 @@ export default function Home({ navigation }: any) {
   };
 
   return (
-    <Container>
+    <Container centralized>
       <Title centralized>O que você busca?</Title>
 
       <View style={styles.buttonsContainer}>
@@ -50,7 +50,9 @@ export default function Home({ navigation }: any) {
         </TouchableOpacity>
       </View>
 
-      <Button onPress={handleButtonPress}>Continuar</Button>
+      <Button onPress={handleButtonPress} size="large">
+        Continuar
+      </Button>
     </Container>
   );
 }

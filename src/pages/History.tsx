@@ -146,7 +146,7 @@ export default function History() {
       <View style={styles.titleContainer}>
         <Title>Histórico</Title>
         <Text style={styles.historySubtitle}>
-          Selecione um item caso queira deleta-lo
+          Selecione um item caso queira o excluir
         </Text>
       </View>
 

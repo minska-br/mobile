@@ -57,7 +57,7 @@ export default function ResultDetail({ route, navigation }: any) {
     <Container centralized>
       <View style={styles.resultInfo}>
         <Subtitle route={route} />
-        <EmissionText value={detail?.totalEmission ?? 0} fontSize={72} />
+        <EmissionText value={detail?.totalEmission ?? 0} fontSize={72} bolder />
         <Text style={styles.frequency}>(ao ano)</Text>
         <Text style={styles.itemName}>{detail?.name}</Text>
       </View>

@@ -1,99 +1,56 @@
 import React, { useContext } from "react";
 import { useEffect } from "react";
 import { useState } from "react";
-import {
-  StyleSheet,
-  SafeAreaView,
-  FlatList,
-  Text,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, SafeAreaView, FlatList, Text, TouchableOpacity } from "react-native";
 import Subtitle from "../components/Subtitle";
 import Title from "../components/Title";
 import RoutesEnum from "../enums/routes";
-import fakeDelay from "../helpers/fakeDelay";
 import { LoadingContext } from "../contexts/LoadingContext";
 import Container from "../components/Container";
-
-const mock = [
-  {
-    id: 1196,
-    title: "compota de abacaxi",
-  },
-  {
-    id: 2777,
-    title: "compota de maçã diet",
-  },
-  {
-    id: 1258,
-    title: "tortura de abacaxi com coco",
-  },
-  {
-    id: 2734,
-    title: "bavaroise de abacaxi",
-  },
-  {
-    id: 1752,
-    title: "perolas de tapioca com compota de frutas",
-  },
-  {
-    id: 2961,
-    title: "torta de abacaxi",
-  },
-  {
-    id: 1609,
-    title: "compota de abacaxi",
-  },
-  {
-    id: 1713,
-    title: "compota de abacaxi diet",
-  },
-  {
-    id: 2303,
-    title: "bolo de abacaxi diferente",
-  },
-  {
-    id: 2193,
-    title: "compota de abacaxi",
-  },
-  {
-    id: 1881,
-    title: "torta de abacaxi",
-  },
-];
+import MinskaApi from "../services/MinskaApi";
+import { AxiosResponse } from "axios";
+import notify from "../helpers/notify";
 
 export default function ResultList({ route, navigation }: any) {
   const [data, setData] = useState<any>([]);
   const { setLoadingStatus } = useContext(LoadingContext);
-  const { searchQuery, activeFluxType } = route.params;
+  const { seachItem, activeFluxType } = route.params;
 
-  const navigateToResultDetail = (item: any) => {
-    navigation.navigate(RoutesEnum.ResultDetail, { activeFluxType });
+  const navigateToResultDetail = (seachItem: any) => {
+    navigation.navigate(RoutesEnum.ResultDetail, { seachItem, activeFluxType });
   };
 
-  const renderItem = ({ item }: any) => (
-    <TouchableOpacity
-      style={styles.item}
-      onPress={() => {
-        setLoadingStatus(true);
-        fakeDelay(() => navigateToResultDetail(item), 10, 5);
-      }}
-    >
-      <Text style={styles.itemText}>{item.title}</Text>
-    </TouchableOpacity>
-  );
+  const renderItem = ({ item }: any) => {
+    const onPressItem = () => {
+      setLoadingStatus(true);
+      navigateToResultDetail(item);
+    };
+    return (
+      <TouchableOpacity style={styles.item} onPress={onPressItem}>
+        <Text style={styles.itemText}>{item.name}</Text>
+      </TouchableOpacity>
+    );
+  };
 
   const getList = async () => {
-    // await request sending searchQuery
-    setData(mock);
-    setLoadingStatus(false);
+    let response!: AxiosResponse<any>;
+    try {
+      response = await MinskaApi.getProductList(seachItem.name);
+      const { data } = response;
+      setData(data);
+      setLoadingStatus(false);
+    } catch (error) {
+      console.error("[ResultList] getList: ", { response });
+      notify("Erro inesperado, tente novamente mais tarde.");
+      setLoadingStatus(false);
+    }
   };
 
   const loadList = () => {
     getList();
   };
 
-  useEffect(loadList, [searchQuery]);
+  useEffect(loadList, [seachItem]);
 
   return (
     <Container>
@@ -101,11 +58,7 @@ export default function ResultList({ route, navigation }: any) {
       <Title>Veja o que nós encontramos</Title>
 
       <SafeAreaView style={styles.safeAreaViewContainer}>
-        <FlatList
-          data={data}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
-        />
+        <FlatList data={data} renderItem={renderItem} keyExtractor={(item) => item.id.toString()} />
       </SafeAreaView>
     </Container>
   );

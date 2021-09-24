@@ -9,6 +9,8 @@ import Subtitle from "../components/Subtitle";
 import { LoadingContext } from "../contexts/LoadingContext";
 import RoutesEnum from "../enums/routes";
 import notify from "../helpers/notify";
+import MinskaApi from "../services/MinskaApi";
+import ActiveFluxType from "../types/ActiveFluxType";
 
 interface Detail {
   name: string;
@@ -18,7 +20,8 @@ interface Detail {
 export default function ResultDetail({ route, navigation }: any) {
   const { setLoadingStatus } = useContext(LoadingContext);
   const [detail, setDetail] = useState<Detail>();
-  const activeFluxType = route.params?.activeFluxType;
+  const activeFluxType: ActiveFluxType = route.params?.activeFluxType;
+  const seachItem = route.params?.seachItem;
 
   const handleAnotherSearch = () => {
     navigation.navigate(RoutesEnum.Search, { activeFluxType });
@@ -36,22 +39,38 @@ export default function ResultDetail({ route, navigation }: any) {
   };
 
   const getDetail = async () => {
-    setLoadingStatus(false);
-    // await request sending id
+    setLoadingStatus(true);
 
-    const isRecipe = activeFluxType === "Recipe";
-    if (isRecipe) {
-      setDetail({ name: "Compota de abacaxi", totalEmission: 50 });
+    if (activeFluxType) {
+      const { id, name } = seachItem;
+      const responseCalculation = await MinskaApi.startCalculation(id, name, activeFluxType);
+      const { calculationId } = responseCalculation.data;
+      const { data } = responseCalculation;
+
+      console.log("[ResultDetail] getDetail(responseCalculation): ", { data });
+      const responseResult = await MinskaApi.getCalculationResult(calculationId);
+
+      console.log("[ResultDetail] getDetail(responseResult): ", { data: responseResult.data });
+      const resultData = responseResult.data;
+      setDetail({ name: resultData.name, totalEmission: resultData.totalCarbonFootprint });
     } else {
-      setDetail({ name: "Banana", totalEmission: 4.5 });
+      const isRecipe = activeFluxType === "Recipe";
+      if (isRecipe) {
+        setDetail({ name: "Compota de abacaxi", totalEmission: 50 });
+      } else {
+        setDetail({ name: "Banana", totalEmission: 4.5 });
+      }
     }
+    setLoadingStatus(false);
   };
 
-  const loadList = () => {
+  const loadDetail = () => {
+    console.log("[seachItem]: ", seachItem);
+
     getDetail();
   };
 
-  useEffect(loadList, []);
+  useEffect(loadDetail, []);
 
   return (
     <Container centralized>

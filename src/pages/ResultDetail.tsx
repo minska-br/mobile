@@ -8,18 +8,17 @@ import EmissionText from "../components/EmissionText";
 import Subtitle from "../components/Subtitle";
 import { LoadingContext } from "../contexts/LoadingContext";
 import RoutesEnum from "../enums/routes";
+import getDateISO from "../helpers/getDateISO";
 import notify from "../helpers/notify";
+import randomIntFromInterval from "../helpers/randomIntFromInterval";
+import HistoryItem from "../interfaces/HistoryItem";
 import MinskaApi from "../services/MinskaApi";
+import StorageService from "../services/StorageService";
 import ActiveFluxType from "../types/ActiveFluxType";
-
-interface Detail {
-  name: string;
-  totalEmission: number;
-}
 
 export default function ResultDetail({ route, navigation }: any) {
   const { setLoadingStatus } = useContext(LoadingContext);
-  const [detail, setDetail] = useState<Detail>();
+  const [detail, setDetail] = useState<HistoryItem>();
   const activeFluxType: ActiveFluxType = route.params?.activeFluxType;
   const seachItem = route.params?.seachItem;
 
@@ -38,12 +37,23 @@ export default function ResultDetail({ route, navigation }: any) {
     setLoadingStatus(false);
   };
 
-  const getDetail = async () => {
-    setLoadingStatus(true);
+  const saveDetailOnHistory = async (item: HistoryItem) => {
+    const key = `history-${getDateISO()}`;
+    console.log("[ResultDetail] saveDetailOnHistory:", key);
+    try {
+      await StorageService.setObjectItem(key, item);
+    } catch (error) {
+      console.log("[ResultDetail|ERROR] saveDetailOnHistory: ", error);
+    }
+  };
 
-    if (activeFluxType) {
+  const getCalculation = async (activeFluxType: ActiveFluxType) => {
+    try {
+      console.log("[ResultDetail] getCalculation: ", seachItem);
+
       const { id, name } = seachItem;
-      const responseCalculation = await MinskaApi.startCalculation(id, name, activeFluxType);
+      const type: ActiveFluxType = activeFluxType === "Recipe" ? "Recipe" : "Product";
+      const responseCalculation = await MinskaApi.startCalculation(id, name, type);
       const { calculationId } = responseCalculation.data;
       const { data } = responseCalculation;
 
@@ -52,21 +62,45 @@ export default function ResultDetail({ route, navigation }: any) {
 
       console.log("[ResultDetail] getDetail(responseResult): ", { data: responseResult.data });
       const resultData = responseResult.data;
-      setDetail({ name: resultData.name, totalEmission: resultData.totalCarbonFootprint });
-    } else {
-      const isRecipe = activeFluxType === "Recipe";
-      if (isRecipe) {
-        setDetail({ name: "Compota de abacaxi", totalEmission: 50 });
-      } else {
-        setDetail({ name: "Banana", totalEmission: 4.5 });
-      }
+
+      const detail: HistoryItem = {
+        id,
+        title: name,
+        emission: resultData.totalCarbonFootprint,
+        type,
+        dateISO: getDateISO(),
+      };
+      setDetail(detail);
+      saveDetailOnHistory(detail);
+    } catch (error) {
+      console.error("[ResultDetail|ERROR]: ", error);
+      notify("Erro inesperado, tente novamente mais tarde.");
+      navigation.navigate(RoutesEnum.Home);
     }
+  };
+
+  const mockedSetup = () => {
+    const isRecipe = activeFluxType === "Recipe";
+    const detail: HistoryItem = {
+      id: new Date().toISOString(),
+      title: isRecipe ? "Compota de abacaxi" : "Banana",
+      emission: isRecipe ? 50 : 4.5,
+      type: isRecipe ? "Recipe" : "Product",
+      dateISO: getDateISO(),
+    };
+    setDetail(detail);
+  };
+
+  const getDetail = async () => {
+    setLoadingStatus(true);
+
+    if (activeFluxType) await getCalculation(activeFluxType);
+    else mockedSetup();
+
     setLoadingStatus(false);
   };
 
   const loadDetail = () => {
-    console.log("[seachItem]: ", seachItem);
-
     getDetail();
   };
 
@@ -76,9 +110,9 @@ export default function ResultDetail({ route, navigation }: any) {
     <Container centralized>
       <View style={styles.resultInfo}>
         <Subtitle route={route} />
-        <EmissionText value={detail?.totalEmission ?? 0} fontSize={72} bolder />
+        <EmissionText value={detail?.emission ?? 0} fontSize={72} bolder />
         <Text style={styles.frequency}>(ao ano)</Text>
-        <Text style={styles.itemName}>{detail?.name}</Text>
+        <Text style={styles.itemName}>{detail?.title}</Text>
       </View>
       <View style={styles.buttonsGrid}>
         <Button disabled centered>

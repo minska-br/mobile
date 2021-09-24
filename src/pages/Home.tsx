@@ -11,10 +11,17 @@ import ActiveFluxType from "../types/ActiveFluxType";
 export default function Home({ navigation }: any) {
   const [activeFluxType, setActiveFluxType] = useState<ActiveFluxType>(null);
 
-  const handleButtonPress = () => {
+  const clearSelectedFluxType = () => setActiveFluxType(null);
+
+  const handleHistoryPress = () => {
+    clearSelectedFluxType();
+    navigation.navigate(RoutesEnum.History);
+  };
+
+  const handleContinuePress = () => {
     if (activeFluxType) {
       navigation.navigate(RoutesEnum.Search, { activeFluxType });
-      setTimeout(() => setActiveFluxType(null), 500);
+      setTimeout(clearSelectedFluxType, 500);
       return;
     }
 
@@ -27,22 +34,14 @@ export default function Home({ navigation }: any) {
 
       <View style={styles.buttonsContainer}>
         <TouchableOpacity
-          style={
-            activeFluxType === "Product"
-              ? styles.squareButtonSelected
-              : styles.squareButton
-          }
+          style={activeFluxType === "Product" ? styles.squareButtonSelected : styles.squareButton}
           activeOpacity={0.8}
           onPress={() => setActiveFluxType("Product")}
         >
           <Text style={styles.squareButtonText}>Produto</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={
-            activeFluxType === "Recipe"
-              ? styles.squareButtonSelected
-              : styles.squareButton
-          }
+          style={activeFluxType === "Recipe" ? styles.squareButtonSelected : styles.squareButton}
           activeOpacity={0.8}
           onPress={() => setActiveFluxType("Recipe")}
         >
@@ -50,7 +49,11 @@ export default function Home({ navigation }: any) {
         </TouchableOpacity>
       </View>
 
-      <Button onPress={handleButtonPress} size="large">
+      <Button onPress={handleHistoryPress} size="large">
+        Histórico
+      </Button>
+
+      <Button onPress={handleContinuePress} size="large">
         Continuar
       </Button>
     </Container>

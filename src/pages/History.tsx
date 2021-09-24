@@ -1,76 +1,28 @@
 import React, { useContext, useEffect } from "react";
 import { useState } from "react";
-import {
-  FlatList,
-  StyleSheet,
-  TouchableOpacity,
-  Text,
-  View,
-  Alert,
-} from "react-native";
+import { FlatList, StyleSheet, TouchableOpacity, Text, View, Alert } from "react-native";
 import Container from "../components/Container";
 import Title from "../components/Title";
 import { LoadingContext } from "../contexts/LoadingContext";
-
-interface HistoryItem {
-  id: number;
-  type: string;
-  title: string;
-  emission: number;
-  dateUTC: string;
-}
-
-const mock: HistoryItem[] = [
-  {
-    id: 451,
-    type: "Product",
-    title: "Abacaxi",
-    emission: 42.7,
-    dateUTC: "",
-  },
-  {
-    id: 734,
-    type: "Recipe",
-    title: "Compota de Abacaxi",
-    emission: 13.2,
-    dateUTC: "",
-  },
-  {
-    id: 708,
-    type: "Product",
-    title: "Alface",
-    emission: 38.0,
-    dateUTC: "",
-  },
-  {
-    id: 612,
-    type: "Recipe",
-    title: "Brownie",
-    emission: 49.3,
-    dateUTC: "",
-  },
-  {
-    id: 729,
-    type: "Recipe",
-    title: "Tiramisù italiano",
-    emission: 50.1,
-    dateUTC: "",
-  },
-];
-
 import { Ionicons } from "@expo/vector-icons";
 import EmissionText from "../components/EmissionText";
+import StorageService from "../services/StorageService";
+import HistoryItem from "../interfaces/HistoryItem";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import notify from "../helpers/notify";
 
-export default function History() {
-  const NOT_SELECTED_ID = -1;
+export default function History({ navigation }: any) {
+  const NOT_SELECTED_ID = "none";
   const [data, setData] = useState<HistoryItem[]>([]);
-  const [selectedItemId, setSelectedItemId] = useState<number>(NOT_SELECTED_ID);
+  const [hasItems, setHasItems] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState<string>(NOT_SELECTED_ID);
   const { setLoadingStatus } = useContext(LoadingContext);
 
   const undoSelection = () => setSelectedItemId(NOT_SELECTED_ID);
 
-  const deleteSelectedItem = () => {
+  const deleteSelectedItem = async () => {
     setLoadingStatus(true);
+    await StorageService.deleteItem(selectedItemId);
     const newData = data.filter((item) => item.id !== selectedItemId);
     setData(newData);
     undoSelection();
@@ -102,7 +54,7 @@ export default function History() {
     const activeContainerStyle = isSelected ? styles.activeItemContainer : null;
     const activeTextStyle = isSelected ? styles.activeItemText : null;
 
-    const onPressItem = (id: number) => {
+    const onPressItem = (id: string) => {
       // setLoadingStatus(true);
       const newId = isSelected ? NOT_SELECTED_ID : id; // Unselect id on twice press
       setSelectedItemId(newId);
@@ -115,12 +67,14 @@ export default function History() {
         onPress={() => onPressItem(item.id)}
       >
         <View>
-          <Text style={styles.itemType}>{item.type}</Text>
+          <Text style={styles.itemType}>{item.type == "Recipe" ? "Receita" : "Produto"}</Text>
         </View>
         <View style={styles.infoContainer}>
-          <Text style={[styles.itemText, activeTextStyle]}>{item.title}</Text>
+          <Text style={[styles.itemText, activeTextStyle]}>
+            {item.title.length > 15 ? item.title?.substring(0, 15).trim() + "..." : item.title}
+          </Text>
           <EmissionText
-            value={item.emission}
+            value={item?.emission ?? 0}
             fontSize={20}
             color={isSelected ? "#fff" : undefined}
           />
@@ -130,12 +84,29 @@ export default function History() {
   };
 
   const getList = async () => {
-    // await request sending searchQuery
-    setData(mock);
+    try {
+      const keys = await StorageService.getAllKeys();
+      const onlyHistoryKeys = (key: string) => key.includes("history");
+      const filteredKeys = keys.filter(onlyHistoryKeys);
+      const historyValues = await StorageService.getMultiple(filteredKeys);
+      const historyData = historyValues.map(([key, value]) => {
+        if (value) {
+          const item = JSON.parse(value);
+          item.id = key;
+          return item;
+        }
+      });
+      setData(historyData);
+    } catch (error) {
+      console.error("[History|ERROR] getList: ", error);
+      notify("Erro inesperado, tente novamente mais tarde.");
+      navigation.navigate();
+    }
     setLoadingStatus(false);
   };
 
   const loadList = () => {
+    // AsyncStorage.clear();
     getList();
   };
 
@@ -146,22 +117,17 @@ export default function History() {
       <View style={styles.titleContainer}>
         <Title>Histórico</Title>
         <Text style={styles.historySubtitle}>
-          Selecione um item caso queira o excluir
+          {data.length
+            ? "Selecione um item caso queira o excluir:"
+            : "Ainda não existem itens no seu histórico."}
         </Text>
       </View>
 
-      <FlatList
-        data={data}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-      />
+      <FlatList data={data} renderItem={renderItem} keyExtractor={(item) => item.id.toString()} />
 
       {selectedItemId !== NOT_SELECTED_ID && (
         <View style={styles.trashButtonContainer}>
-          <TouchableOpacity
-            style={styles.trashButton}
-            onPress={handleTrashPress}
-          >
+          <TouchableOpacity style={styles.trashButton} onPress={handleTrashPress}>
             <Ionicons name="md-trash-outline" color="white" size={30} />
           </TouchableOpacity>
         </View>

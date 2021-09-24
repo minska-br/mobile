@@ -2,58 +2,54 @@ import React, { useContext } from "react";
 import { useRef } from "react";
 import { useEffect } from "react";
 import { useState } from "react";
-import { StyleSheet, TextInput, View } from "react-native";
+import { StyleSheet, TextInput } from "react-native";
 import Button from "../components/Button";
 import Container from "../components/Container";
 import Subtitle from "../components/Subtitle";
 import Title from "../components/Title";
 import recipes from "../constants/recipes";
 import RoutesEnum from "../enums/routes";
-import Loading from "../components/Loading";
 import fakeDelay from "../helpers/fakeDelay";
 import { LoadingContext } from "../contexts/LoadingContext";
 import notify from "../helpers/notify";
 import getRandomItemFromArray from "../helpers/getRandomItemFromArray";
 import products from "../constants/products";
+import ActiveFluxType from "../types/ActiveFluxType";
 
 export default function Search({ route, navigation }: any) {
+  const activeFluxType: ActiveFluxType = route.params?.activeFluxType;
+  const isRecipeFlux = activeFluxType === "Recipe";
+
   const inputref = useRef<TextInput>(null);
   const [inputValue, setInputValue] = useState("");
   const { setLoadingStatus } = useContext(LoadingContext);
 
-  const activeFluxType = route.params?.activeFluxType;
-  const isRecipeFlux = activeFluxType === "Recipe";
+  const clearInput = () => setInputValue("");
+  const focusOnInputField = () => inputref.current?.focus();
 
   const getPlaceholder = () => {
     if (isRecipeFlux) return getRandomItemFromArray(recipes);
     else return getRandomItemFromArray(products);
   };
 
-  const navigateToResultList = () => {
+  const navigateToNextScreen = () => {
     const { ResultList, ResultDetail } = RoutesEnum;
     const nextScreen = isRecipeFlux ? ResultList : ResultDetail;
-
-    navigation.navigate(nextScreen, {
-      // searchQuery: inputValue, TODO: Send this value to result list when integrated
-      activeFluxType,
-    });
+    const seachItem = { name: inputValue };
+    const params = { seachItem, activeFluxType };
+    navigation.navigate(nextScreen, params);
   };
 
-  const handeSearch = () => {
+  const handeSearch = async () => {
     setLoadingStatus(true);
     notify(`Search: ${inputValue}`, true);
-
-    fakeDelay(() => {
-      navigateToResultList();
-      setInputValue("");
-      setTimeout(() => setLoadingStatus(false), 500);
-    }, 3);
+    navigateToNextScreen();
+    fakeDelay(clearInput, 3);
   };
 
   const openKeyboardOnLoad = () => {
     setLoadingStatus(false);
     const timeout = 1 * 1000;
-    const focusOnInputField = () => inputref.current?.focus();
     setTimeout(focusOnInputField, timeout);
   };
 

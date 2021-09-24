@@ -12,7 +12,7 @@ const Stack = createNativeStackNavigator();
 const AppRoutes: React.FC = () => {
   return (
     <Stack.Navigator
-      initialRouteName={RoutesEnum.History}
+      initialRouteName={RoutesEnum.Home}
       screenOptions={{ headerShown: false }}
     >
       <Stack.Screen name={RoutesEnum.Home} component={Home} />

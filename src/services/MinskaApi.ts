@@ -6,7 +6,7 @@ import {
   START_CALCULATION_ENDPOINT,
   PRODUCT_LIST_ENDPOINT,
   CALCULATION_RESULT_ENDPOINT,
-} from "@env";
+} from "../../env.json";
 
 const headers = { "Access-Control-Allow-Origin": "*" };
 

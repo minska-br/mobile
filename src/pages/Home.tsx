@@ -9,23 +9,12 @@ import notify from "../helpers/notify";
 import ActiveFluxType from "../types/ActiveFluxType";
 
 export default function Home({ navigation }: any) {
-  const [activeFluxType, setActiveFluxType] = useState<ActiveFluxType>(null);
-
-  const clearSelectedFluxType = () => setActiveFluxType(null);
-
   const handleHistoryPress = () => {
-    clearSelectedFluxType();
     navigation.navigate(RoutesEnum.History);
   };
 
-  const handleContinuePress = () => {
-    if (activeFluxType) {
-      navigation.navigate(RoutesEnum.Search, { activeFluxType });
-      setTimeout(clearSelectedFluxType, 500);
-      return;
-    }
-
-    notify(`Selecione um item para continuar.`);
+  const handleFluxPress = (activeFluxType: ActiveFluxType) => {
+    navigation.navigate(RoutesEnum.Search, { activeFluxType });
   };
 
   return (
@@ -33,28 +22,16 @@ export default function Home({ navigation }: any) {
       <Title centralized>O que você busca?</Title>
 
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity
-          style={activeFluxType === "Product" ? styles.squareButtonSelected : styles.squareButton}
-          activeOpacity={0.8}
-          onPress={() => setActiveFluxType("Product")}
-        >
+        <TouchableOpacity style={styles.squareButton} onPress={() => handleFluxPress("Product")}>
           <Text style={styles.squareButtonText}>Produto</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={activeFluxType === "Recipe" ? styles.squareButtonSelected : styles.squareButton}
-          activeOpacity={0.8}
-          onPress={() => setActiveFluxType("Recipe")}
-        >
+        <TouchableOpacity style={styles.squareButton} onPress={() => handleFluxPress("Recipe")}>
           <Text style={styles.squareButtonText}>Receita</Text>
         </TouchableOpacity>
       </View>
 
       <Button onPress={handleHistoryPress} size="large">
         Histórico
-      </Button>
-
-      <Button onPress={handleContinuePress} size="large">
-        Continuar
       </Button>
     </Container>
   );
@@ -71,17 +48,6 @@ const styles = StyleSheet.create({
   },
   squareButton: {
     backgroundColor: "#898989",
-    alignItems: "center",
-    justifyContent: "center",
-    height: 160,
-    width: "47%",
-    borderRadius: 4,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    margin: 4,
-  },
-  squareButtonSelected: {
-    backgroundColor: "#333",
     alignItems: "center",
     justifyContent: "center",
     height: 160,

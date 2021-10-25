@@ -14,10 +14,9 @@ import { StorageContext } from "../contexts/StorageContext";
 import notify from "../helpers/notify";
 import getRandomItemFromArray from "../helpers/getRandomItemFromArray";
 import products from "../constants/products";
-import ActiveFluxType from "../types/ActiveFluxType";
 
-export default function Search({ route, navigation }: any) {
-  const activeFluxType: ActiveFluxType = route.params?.activeFluxType;
+export default function Search({ navigation }: any) {
+  const { activeFluxType } = useContext(StorageContext);
   const isRecipeFlux = activeFluxType === "Recipe";
 
   const inputref = useRef<TextInput>(null);
@@ -57,7 +56,7 @@ export default function Search({ route, navigation }: any) {
 
   return (
     <Container>
-      <Subtitle route={route} />
+      <Subtitle>{activeFluxType == "Recipe" ? "Receita" : "Produto"}</Subtitle>
       <Title>Digite o que deseja procurar</Title>
       <TextInput
         ref={inputref}

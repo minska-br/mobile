@@ -16,13 +16,12 @@ import StorageService from "../services/StorageService";
 import ActiveFluxType from "../types/ActiveFluxType";
 
 export default function Detail({ route, navigation }: any) {
-  const { setLoadingStatus } = useContext(StorageContext);
+  const { activeFluxType, setLoadingStatus } = useContext(StorageContext);
   const [detail, setDetail] = useState<HistoryItem>();
-  const activeFluxType: ActiveFluxType = route.params?.activeFluxType;
   const seachItem = route.params?.seachItem;
 
   const handleAnotherSearch = () => {
-    navigation.navigate(RoutesEnum.Search, { activeFluxType });
+    navigation.navigate(RoutesEnum.Search);
   };
 
   const handleHowToCalculate = () => {
@@ -108,7 +107,7 @@ export default function Detail({ route, navigation }: any) {
   return (
     <Container centralized>
       <View style={styles.resultInfo}>
-        <Subtitle route={route} />
+        <Subtitle>{activeFluxType == "Recipe" ? "Receita" : "Produto"}</Subtitle>
         <EmissionText value={detail?.emission ?? 0} fontSize={64} bolder />
         <Text style={styles.frequency}>(ao ano)</Text>
         <Text style={styles.itemName}>{detail?.title}</Text>

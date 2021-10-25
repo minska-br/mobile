@@ -54,7 +54,7 @@ export default function SearchResult({ route, navigation }: any) {
 
   return (
     <Container>
-      <Subtitle route={route} />
+      <Subtitle>{activeFluxType == "Recipe" ? "Receita" : "Produto"}</Subtitle>
       <Title>Veja o que nós encontramos</Title>
 
       <SafeAreaView style={styles.safeAreaViewContainer}>

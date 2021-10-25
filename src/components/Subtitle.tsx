@@ -1,9 +1,8 @@
 import React from "react";
 import { StyleSheet, Text } from "react-native";
-import ActiveFluxType from "../types/ActiveFluxType";
 
 interface SubtitleProps {
-  route: any;
+  children?: any;
 }
 
 export default class Subtitle extends React.Component<SubtitleProps> {
@@ -12,16 +11,9 @@ export default class Subtitle extends React.Component<SubtitleProps> {
   }
 
   getText() {
-    const { children, route } = this.props;
-
-    if (children) return children;
-
-    const activeFluxType: ActiveFluxType = route.params?.activeFluxType;
-
-    if (!activeFluxType) return "Subtitle";
-
-    const isRecipe = activeFluxType === "Recipe";
-    return isRecipe ? "Receita" : "Produto";
+    const { children } = this.props;
+    const defaultSubtitleValue = "Undefined";
+    return children ? children : defaultSubtitleValue;
   }
 
   render() {

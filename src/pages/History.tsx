@@ -1,6 +1,14 @@
 import React, { useContext, useEffect } from "react";
 import { useState } from "react";
-import { FlatList, StyleSheet, TouchableOpacity, Text, View, Alert } from "react-native";
+import {
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  View,
+  Alert,
+  BackHandler,
+} from "react-native";
 import Container from "../components/Container";
 import Title from "../components/Title";
 import { StorageContext } from "../contexts/StorageContext";
@@ -9,6 +17,7 @@ import EmissionText from "../components/EmissionText";
 import StorageService from "../services/StorageService";
 import HistoryItem from "../interfaces/HistoryItem";
 import notify from "../helpers/notify";
+import RoutesEnum from "../enums/routes";
 
 export default function History({ navigation }: any) {
   const NOT_SELECTED_ID = "none";
@@ -103,17 +112,25 @@ export default function History({ navigation }: any) {
     setLoadingStatus(false);
   };
 
-  const loadList = () => {
-    // AsyncStorage.clear();
-    getList();
+  const navigateToHome = () => {
+    navigation.navigate(RoutesEnum.Home);
+    return true; // Just to use as back click without type problems
   };
 
-  useEffect(loadList, []);
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", navigateToHome);
+    return () => backHandler.remove();
+  }, []);
+
+  useEffect(() => {
+    getList();
+  }, []);
 
   return (
     <Container>
       <View style={styles.titleContainer}>
         <Title>Histórico</Title>
+
         <Text style={styles.historySubtitle}>
           {data.length
             ? "Selecione um item caso queira o excluir:"

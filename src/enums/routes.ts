@@ -4,6 +4,7 @@ enum RoutesEnum {
   SearchResult = "SearchResult",
   Detail = "Detail",
   History = "History",
+  CalculatingEmptyState = "CalculatingEmptyState",
 }
 
 export default RoutesEnum;

@@ -11,9 +11,7 @@ import ActiveFluxType from "../types/ActiveFluxType";
 export default function Home({ navigation }: any) {
   const { setActiveFluxType } = useContext(StorageContext);
 
-  const handleHistoryPress = () => {
-    navigation.navigate(RoutesEnum.History);
-  };
+  const handleHistoryPress = () => navigation.navigate(RoutesEnum.History);
 
   const handleFluxPress = (activeFluxType: ActiveFluxType) => {
     setActiveFluxType(activeFluxType);

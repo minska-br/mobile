@@ -3,6 +3,7 @@ import { StyleSheet, Text } from "react-native";
 
 interface SubtitleProps {
   children?: any;
+  centralized?: boolean;
 }
 
 export default class Subtitle extends React.Component<SubtitleProps> {
@@ -17,7 +18,13 @@ export default class Subtitle extends React.Component<SubtitleProps> {
   }
 
   render() {
-    return <Text style={styles.subtitle}>{this.getText()}</Text>;
+    const { centralized } = this.props;
+
+    return (
+      <Text style={[styles.subtitle, { textAlign: centralized ? "center" : "auto" }]}>
+        {this.getText()}
+      </Text>
+    );
   }
 }
 
@@ -26,7 +33,6 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto",
     fontSize: 24,
     color: "#A5A3A3",
-    width: "100%",
     fontWeight: "bold",
   },
 });

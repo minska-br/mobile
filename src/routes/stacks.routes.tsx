@@ -6,6 +6,7 @@ import RoutesEnum from "../enums/routes";
 import SearchResult from "../pages/SearchResult";
 import Detail from "../pages/Detail";
 import History from "../pages/History";
+import CalculatingEmptyState from "../pages/CalculatingEmptyState";
 
 const Stack = createNativeStackNavigator();
 
@@ -17,6 +18,7 @@ const AppRoutes: React.FC = () => {
       <Stack.Screen name={RoutesEnum.SearchResult} component={SearchResult} />
       <Stack.Screen name={RoutesEnum.Detail} component={Detail} />
       <Stack.Screen name={RoutesEnum.History} component={History} />
+      <Stack.Screen name={RoutesEnum.CalculatingEmptyState} component={CalculatingEmptyState} />
     </Stack.Navigator>
   );
 };

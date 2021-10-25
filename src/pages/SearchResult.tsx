@@ -16,15 +16,12 @@ export default function SearchResult({ route, navigation }: any) {
   const { setLoadingStatus } = useContext(StorageContext);
   const { seachItem, activeFluxType } = route.params;
 
-  const navigateToDetail = (seachItem: any) => {
-    navigation.navigate(RoutesEnum.Detail, { seachItem, activeFluxType });
-  };
-
   const renderItem = ({ item }: any) => {
     const onPressItem = () => {
       setLoadingStatus(true);
-      navigateToDetail(item);
+      navigation.navigate(RoutesEnum.CalculatingEmptyState);
     };
+
     return (
       <TouchableOpacity style={styles.item} onPress={onPressItem}>
         <Text style={styles.itemText}>{item.name}</Text>

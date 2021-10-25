@@ -3,20 +3,18 @@ import { useState } from "react";
 import { FlatList, StyleSheet, TouchableOpacity, Text, View, Alert } from "react-native";
 import Container from "../components/Container";
 import Title from "../components/Title";
-import { LoadingContext } from "../contexts/LoadingContext";
+import { StorageContext } from "../contexts/StorageContext";
 import { Ionicons } from "@expo/vector-icons";
 import EmissionText from "../components/EmissionText";
 import StorageService from "../services/StorageService";
 import HistoryItem from "../interfaces/HistoryItem";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import notify from "../helpers/notify";
 
 export default function History({ navigation }: any) {
   const NOT_SELECTED_ID = "none";
   const [data, setData] = useState<HistoryItem[]>([]);
-  const [hasItems, setHasItems] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState<string>(NOT_SELECTED_ID);
-  const { setLoadingStatus } = useContext(LoadingContext);
+  const { setLoadingStatus } = useContext(StorageContext);
 
   const undoSelection = () => setSelectedItemId(NOT_SELECTED_ID);
 

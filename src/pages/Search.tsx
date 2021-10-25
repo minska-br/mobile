@@ -10,7 +10,7 @@ import Title from "../components/Title";
 import recipes from "../constants/recipes";
 import RoutesEnum from "../enums/routes";
 import fakeDelay from "../helpers/fakeDelay";
-import { LoadingContext } from "../contexts/LoadingContext";
+import { StorageContext } from "../contexts/StorageContext";
 import notify from "../helpers/notify";
 import getRandomItemFromArray from "../helpers/getRandomItemFromArray";
 import products from "../constants/products";
@@ -22,7 +22,7 @@ export default function Search({ route, navigation }: any) {
 
   const inputref = useRef<TextInput>(null);
   const [inputValue, setInputValue] = useState("");
-  const { setLoadingStatus } = useContext(LoadingContext);
+  const { setLoadingStatus } = useContext(StorageContext);
 
   const clearInput = () => setInputValue("");
   const focusOnInputField = () => inputref.current?.focus();

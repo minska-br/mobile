@@ -1,19 +1,17 @@
 import { createContext, ReactNode, useState } from "react";
 import React from "react";
 
-interface LoadingContextData {
+interface StorageContextData {
   loadingStatus: boolean;
   setLoadingStatus: (value: boolean) => void;
 }
 
-export const LoadingContext = createContext({} as LoadingContextData);
+export const StorageContext = createContext({} as StorageContextData);
 
-interface LoadingContextProviderProps {
+interface StorageContextProviderProps {
   children: ReactNode;
 }
-export default function LoadingContextProvider({
-  children,
-}: LoadingContextProviderProps) {
+export default function StorageContextProvider({ children }: StorageContextProviderProps) {
   const [loadingStatus, setLoadingStatusProvider] = useState(false);
 
   function setLoadingStatus(value: boolean) {
@@ -21,8 +19,8 @@ export default function LoadingContextProvider({
   }
 
   return (
-    <LoadingContext.Provider value={{ loadingStatus, setLoadingStatus }}>
+    <StorageContext.Provider value={{ loadingStatus, setLoadingStatus }}>
       {children}
-    </LoadingContext.Provider>
+    </StorageContext.Provider>
   );
 }

@@ -1,14 +1,14 @@
 import React from "react";
 import Routes from "./src/routes";
 import { RootSiblingParent } from "react-native-root-siblings";
-import LoadingContextProvider from "./src/contexts/LoadingContext";
+import StorageContextProvider from "./src/contexts/StorageContext";
 
 export default function Main() {
   return (
     <RootSiblingParent>
-      <LoadingContextProvider>
+      <StorageContextProvider>
         <Routes />
-      </LoadingContextProvider>
+      </StorageContextProvider>
     </RootSiblingParent>
   );
 }

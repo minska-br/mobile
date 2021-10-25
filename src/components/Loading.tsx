@@ -1,10 +1,10 @@
 import React, { useContext } from "react";
 import { Image, ImageBackground, StyleSheet, View } from "react-native";
-import { LoadingContext } from "../contexts/LoadingContext";
+import { StorageContext } from "../contexts/StorageContext";
 
 export default function Loading(props: any) {
   const { children } = props;
-  const { loadingStatus } = useContext(LoadingContext);
+  const { loadingStatus } = useContext(StorageContext);
 
   const loading = (
     <View style={styles.loadingContainer}>

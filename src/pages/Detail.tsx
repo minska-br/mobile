@@ -6,18 +6,17 @@ import Button from "../components/Button";
 import Container from "../components/Container";
 import EmissionText from "../components/EmissionText";
 import Subtitle from "../components/Subtitle";
-import { LoadingContext } from "../contexts/LoadingContext";
+import { StorageContext } from "../contexts/StorageContext";
 import RoutesEnum from "../enums/routes";
 import getDateISO from "../helpers/getDateISO";
 import notify from "../helpers/notify";
-import randomIntFromInterval from "../helpers/randomIntFromInterval";
 import HistoryItem from "../interfaces/HistoryItem";
 import MinskaApi from "../services/MinskaApi";
 import StorageService from "../services/StorageService";
 import ActiveFluxType from "../types/ActiveFluxType";
 
 export default function Detail({ route, navigation }: any) {
-  const { setLoadingStatus } = useContext(LoadingContext);
+  const { setLoadingStatus } = useContext(StorageContext);
   const [detail, setDetail] = useState<HistoryItem>();
   const activeFluxType: ActiveFluxType = route.params?.activeFluxType;
   const seachItem = route.params?.seachItem;

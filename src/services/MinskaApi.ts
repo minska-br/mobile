@@ -27,7 +27,7 @@ class MinskaApi {
   static startCalculation = async (
     recipeId: number | null,
     foodName: string,
-    type: string,
+    type: "product" | "recipe",
     amount: number = 1
   ) => {
     const body = { foodName, type, recipeId, amount };

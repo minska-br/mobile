@@ -16,14 +16,14 @@ export default function ResultList({ route, navigation }: any) {
   const { setLoadingStatus } = useContext(LoadingContext);
   const { seachItem, activeFluxType } = route.params;
 
-  const navigateToResultDetail = (seachItem: any) => {
-    navigation.navigate(RoutesEnum.ResultDetail, { seachItem, activeFluxType });
+  const navigateToDetail = (seachItem: any) => {
+    navigation.navigate(RoutesEnum.Detail, { seachItem, activeFluxType });
   };
 
   const renderItem = ({ item }: any) => {
     const onPressItem = () => {
       setLoadingStatus(true);
-      navigateToResultDetail(item);
+      navigateToDetail(item);
     };
     return (
       <TouchableOpacity style={styles.item} onPress={onPressItem}>

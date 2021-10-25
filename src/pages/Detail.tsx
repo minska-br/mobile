@@ -16,7 +16,7 @@ import MinskaApi from "../services/MinskaApi";
 import StorageService from "../services/StorageService";
 import ActiveFluxType from "../types/ActiveFluxType";
 
-export default function ResultDetail({ route, navigation }: any) {
+export default function Detail({ route, navigation }: any) {
   const { setLoadingStatus } = useContext(LoadingContext);
   const [detail, setDetail] = useState<HistoryItem>();
   const activeFluxType: ActiveFluxType = route.params?.activeFluxType;
@@ -39,17 +39,17 @@ export default function ResultDetail({ route, navigation }: any) {
 
   const saveDetailOnHistory = async (item: HistoryItem) => {
     const key = `history-${getDateISO()}`;
-    console.log("[ResultDetail] saveDetailOnHistory:", key);
+    console.log("[Detail] saveDetailOnHistory:", key);
     try {
       await StorageService.setObjectItem(key, item);
     } catch (error) {
-      console.log("[ResultDetail|ERROR] saveDetailOnHistory: ", error);
+      console.log("[Detail|ERROR] saveDetailOnHistory: ", error);
     }
   };
 
   const getCalculation = async (activeFluxType: ActiveFluxType) => {
     try {
-      console.log("[ResultDetail] getCalculation: ", seachItem);
+      console.log("[Detail] getCalculation: ", seachItem);
 
       const { id, name } = seachItem;
       const type: ActiveFluxType = activeFluxType === "Recipe" ? "Recipe" : "Product";
@@ -57,10 +57,10 @@ export default function ResultDetail({ route, navigation }: any) {
       const { calculationId } = responseCalculation.data;
       const { data } = responseCalculation;
 
-      console.log("[ResultDetail] getDetail(responseCalculation): ", { data });
+      console.log("[Detail] getDetail(responseCalculation): ", { data });
       const responseResult = await MinskaApi.getCalculationResult(calculationId);
 
-      console.log("[ResultDetail] getDetail(responseResult): ", { data: responseResult.data });
+      console.log("[Detail] getDetail(responseResult): ", { data: responseResult.data });
       const resultData = responseResult.data;
 
       const detail: HistoryItem = {
@@ -73,7 +73,7 @@ export default function ResultDetail({ route, navigation }: any) {
       setDetail(detail);
       saveDetailOnHistory(detail);
     } catch (error) {
-      console.error("[ResultDetail|ERROR]: ", error);
+      console.error("[Detail|ERROR]: ", error);
       notify("Erro inesperado, tente novamente mais tarde.");
       navigation.navigate(RoutesEnum.Home);
     }

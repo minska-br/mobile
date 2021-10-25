@@ -1,7 +1,7 @@
 enum RoutesEnum {
   Home = "Home",
   Search = "Search",
-  ResultList = "ResultList",
+  SearchResult = "SearchResult",
   Detail = "Detail",
   History = "History",
 }

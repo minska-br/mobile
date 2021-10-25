@@ -33,8 +33,8 @@ export default function Search({ route, navigation }: any) {
   };
 
   const navigateToNextScreen = () => {
-    const { ResultList, Detail } = RoutesEnum;
-    const nextScreen = isRecipeFlux ? ResultList : Detail;
+    const { SearchResult, Detail } = RoutesEnum;
+    const nextScreen = isRecipeFlux ? SearchResult : Detail;
     const seachItem = { name: inputValue };
     const params = { seachItem, activeFluxType };
     navigation.navigate(nextScreen, params);

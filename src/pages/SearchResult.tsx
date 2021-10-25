@@ -11,7 +11,7 @@ import MinskaApi from "../services/MinskaApi";
 import { AxiosResponse } from "axios";
 import notify from "../helpers/notify";
 
-export default function ResultList({ route, navigation }: any) {
+export default function SearchResult({ route, navigation }: any) {
   const [data, setData] = useState<any>([]);
   const { setLoadingStatus } = useContext(LoadingContext);
   const { seachItem, activeFluxType } = route.params;
@@ -40,7 +40,7 @@ export default function ResultList({ route, navigation }: any) {
       setData(data);
       setLoadingStatus(false);
     } catch (error) {
-      console.error("[ResultList] getList: ", { response });
+      console.error("[SearchResult] getList: ", { response });
       notify("Erro inesperado, tente novamente mais tarde.");
       setLoadingStatus(false);
     }

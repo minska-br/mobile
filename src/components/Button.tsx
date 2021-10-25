@@ -1,11 +1,5 @@
 import React from "react";
-
-import {
-  GestureResponderEvent,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-} from "react-native";
+import { GestureResponderEvent, StyleSheet, Text, TouchableOpacity } from "react-native";
 
 interface ButtonProps {
   disabled?: boolean;
@@ -24,11 +18,7 @@ export default class Button extends React.Component<ButtonProps> {
     const size = this.props.size ?? "common";
 
     return (
-      <TouchableOpacity
-        style={styles.button}
-        onPress={onPress}
-        disabled={disabled || false}
-      >
+      <TouchableOpacity style={styles.button} onPress={onPress} disabled={disabled || false}>
         <Text
           style={[
             styles.buttonText,

@@ -2,9 +2,9 @@ const INIT = "@Minska:";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const logging = (method: string, value?: any) =>
-  console.log(`[StorageService/${method}]`, { value });
+  console.log(`\n[HistoryService/${method}]`, { value });
 
-export default class StorageService {
+export default class HistoryService {
   private static getKey = (key: string) => INIT + key;
 
   static getAllKeys = async () => {

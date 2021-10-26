@@ -1,6 +1,6 @@
 export default interface HistoryItem {
   id: string;
-  type: "Recipe" | "Product";
+  type: "recipe" | "product";
   title: string;
   emission: number;
   dateISO: string;

@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import Container from "../components/Container";
 import Title from "../components/Title";
-import { StorageContext } from "../contexts/StorageContext";
+import { SessionContext } from "../contexts/SessionContext";
 import { Ionicons } from "@expo/vector-icons";
 import EmissionText from "../components/EmissionText";
 import StorageService from "../services/StorageService";
@@ -23,7 +23,7 @@ export default function History({ navigation }: any) {
   const NOT_SELECTED_ID = "none";
   const [data, setData] = useState<HistoryItem[]>([]);
   const [selectedItemId, setSelectedItemId] = useState<string>(NOT_SELECTED_ID);
-  const { setLoadingStatus } = useContext(StorageContext);
+  const { setLoadingStatus } = useContext(SessionContext);
 
   const undoSelection = () => setSelectedItemId(NOT_SELECTED_ID);
 

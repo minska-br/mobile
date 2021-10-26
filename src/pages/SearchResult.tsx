@@ -5,7 +5,7 @@ import { StyleSheet, SafeAreaView, FlatList, Text, TouchableOpacity } from "reac
 import Subtitle from "../components/Subtitle";
 import Title from "../components/Title";
 import RoutesEnum from "../enums/routes";
-import { StorageContext } from "../contexts/StorageContext";
+import { SessionContext } from "../contexts/SessionContext";
 import Container from "../components/Container";
 import MinskaApi from "../services/MinskaApi";
 import { AxiosResponse } from "axios";
@@ -13,7 +13,7 @@ import notify from "../helpers/notify";
 
 export default function SearchResult({ route, navigation }: any) {
   const [data, setData] = useState<any>([]);
-  const { setLoadingStatus } = useContext(StorageContext);
+  const { setLoadingStatus } = useContext(SessionContext);
   const { seachItem, activeFluxType } = route.params;
 
   const renderItem = ({ item }: any) => {

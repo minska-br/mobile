@@ -10,18 +10,19 @@ import Title from "../components/Title";
 import recipes from "../constants/recipes";
 import RoutesEnum from "../enums/routes";
 import fakeDelay from "../helpers/fakeDelay";
-import { StorageContext } from "../contexts/StorageContext";
+import { SessionContext } from "../contexts/SessionContext";
 import notify from "../helpers/notify";
 import getRandomItemFromArray from "../helpers/getRandomItemFromArray";
 import products from "../constants/products";
+import MinskaApi from "../services/MinskaApi";
 
 export default function Search({ navigation }: any) {
-  const { activeFluxType } = useContext(StorageContext);
+  const { activeFluxType } = useContext(SessionContext);
   const isRecipeFlux = activeFluxType === "Recipe";
 
   const inputref = useRef<TextInput>(null);
   const [inputValue, setInputValue] = useState("");
-  const { setLoadingStatus } = useContext(StorageContext);
+  const { setLoadingStatus } = useContext(SessionContext);
 
   const clearInput = () => setInputValue("");
   const focusOnInputField = () => inputref.current?.focus();
@@ -39,9 +40,21 @@ export default function Search({ navigation }: any) {
     navigation.navigate(nextScreen, params);
   };
 
-  const handeSearch = async () => {
+  const handleSearch = async () => {
     setLoadingStatus(true);
     notify(`Search: ${inputValue}`, true);
+    const seachItem = { name: inputValue };
+
+    if (isRecipeFlux) {
+      const params = { seachItem };
+      navigation.navigate(RoutesEnum.SearchResult, params);
+    } else {
+      const response = await MinskaApi.startCalculation(null, seachItem.name, "product");
+      console.log("[Search] handleSearch: ", { response });
+
+      navigation.navigate(RoutesEnum.CalculatingEmptyState);
+    }
+
     navigateToNextScreen();
     fakeDelay(clearInput, 3);
   };
@@ -65,7 +78,7 @@ export default function Search({ navigation }: any) {
         onChangeText={(text) => setInputValue(text)}
         value={inputValue}
       ></TextInput>
-      <Button disabled={inputValue.length <= 0} onPress={handeSearch}>
+      <Button disabled={inputValue.length <= 0} onPress={handleSearch}>
         Continuar
       </Button>
     </Container>

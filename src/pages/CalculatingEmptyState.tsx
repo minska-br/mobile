@@ -2,14 +2,14 @@ import React, { useContext, useEffect } from "react";
 import { StyleSheet, Text, View, BackHandler } from "react-native";
 import Container from "../components/Container";
 import Title from "../components/Title";
-import { StorageContext } from "../contexts/StorageContext";
+import { SessionContext } from "../contexts/SessionContext";
 import { Ionicons } from "@expo/vector-icons";
 import Subtitle from "../components/Subtitle";
 import Button from "../components/Button";
 import RoutesEnum from "../enums/routes";
 
 export default function CalculatingEmptyState({ navigation }: any) {
-  const { activeFluxType, setLoadingStatus } = useContext(StorageContext);
+  const { activeFluxType, setLoadingStatus } = useContext(SessionContext);
 
   const getItemText = () => {
     return activeFluxType == "Product" ? "do seu produto" : "da sua receita";

@@ -4,12 +4,12 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Button from "../components/Button";
 import Container from "../components/Container";
 import Title from "../components/Title";
-import { StorageContext } from "../contexts/StorageContext";
+import { SessionContext } from "../contexts/SessionContext";
 import RoutesEnum from "../enums/routes";
 import ActiveFluxType from "../types/ActiveFluxType";
 
 export default function Home({ navigation }: any) {
-  const { setActiveFluxType } = useContext(StorageContext);
+  const { setActiveFluxType } = useContext(SessionContext);
 
   const handleHistoryPress = () => navigation.navigate(RoutesEnum.History);
 

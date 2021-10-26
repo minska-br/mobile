@@ -6,7 +6,7 @@ import Button from "../components/Button";
 import Container from "../components/Container";
 import EmissionText from "../components/EmissionText";
 import Subtitle from "../components/Subtitle";
-import { StorageContext } from "../contexts/StorageContext";
+import { SessionContext } from "../contexts/SessionContext";
 import RoutesEnum from "../enums/routes";
 import getDateISO from "../helpers/getDateISO";
 import notify from "../helpers/notify";
@@ -16,7 +16,7 @@ import StorageService from "../services/StorageService";
 import ActiveFluxType from "../types/ActiveFluxType";
 
 export default function Detail({ route, navigation }: any) {
-  const { activeFluxType, setLoadingStatus } = useContext(StorageContext);
+  const { activeFluxType, setLoadingStatus } = useContext(SessionContext);
   const [detail, setDetail] = useState<HistoryItem>();
   const seachItem = route.params?.seachItem;
 
@@ -50,7 +50,7 @@ export default function Detail({ route, navigation }: any) {
       console.log("[Detail] getCalculation: ", seachItem);
 
       const { id, name } = seachItem;
-      const type: ActiveFluxType = activeFluxType === "Recipe" ? "Recipe" : "Product";
+      const type = activeFluxType === "Recipe" ? "recipe" : "product";
       const responseCalculation = await MinskaApi.startCalculation(id, name, type);
       const { calculationId } = responseCalculation.data;
       const { data } = responseCalculation;
@@ -83,7 +83,7 @@ export default function Detail({ route, navigation }: any) {
       id: new Date().toISOString(),
       title: isRecipe ? "Compota de abacaxi" : "Banana",
       emission: isRecipe ? 50 : 4.5,
-      type: isRecipe ? "Recipe" : "Product",
+      type: isRecipe ? "recipe" : "product",
       dateISO: getDateISO(),
     };
     setDetail(detail);

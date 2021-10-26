@@ -1,6 +1,8 @@
+import CalculationType from "../types/CalculationType";
+
 export default interface HistoryItem {
   id: string;
-  type: "recipe" | "product";
+  type: CalculationType;
   title: string;
   emission: number;
   dateISO: string;

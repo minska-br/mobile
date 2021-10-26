@@ -7,6 +7,7 @@ import {
   PRODUCT_LIST_ENDPOINT,
   CALCULATION_RESULT_ENDPOINT,
 } from "../../env.json";
+import CalculationType from "../types/CalculationType";
 
 const headers = { "Access-Control-Allow-Origin": "*" };
 
@@ -27,7 +28,7 @@ class MinskaApi {
   static startCalculation = async (
     recipeId: number | null,
     foodName: string,
-    type: "product" | "recipe",
+    type: CalculationType,
     amount: number = 1
   ) => {
     const body = { foodName, type, recipeId, amount };

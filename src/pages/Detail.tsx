@@ -12,7 +12,7 @@ import getDateISO from "../helpers/getDateISO";
 import notify from "../helpers/notify";
 import HistoryItem from "../interfaces/HistoryItem";
 import MinskaApi from "../services/MinskaApi";
-import StorageService from "../services/StorageService";
+import StorageService from "../services/HistoryService";
 import ActiveFluxType from "../types/ActiveFluxType";
 
 export default function Detail({ route, navigation }: any) {
@@ -49,27 +49,27 @@ export default function Detail({ route, navigation }: any) {
     try {
       console.log("[Detail] getCalculation: ", seachItem);
 
-      const { id, name } = seachItem;
-      const type = activeFluxType === "Recipe" ? "recipe" : "product";
-      const responseCalculation = await MinskaApi.startCalculation(id, name, type);
-      const { calculationId } = responseCalculation.data;
-      const { data } = responseCalculation;
+      // const { id, name } = seachItem;
+      // const type = activeFluxType === "Recipe" ? "recipe" : "product";
+      // const responseCalculation = await MinskaApi.startCalculation(id, name, type);
+      // const { calculationId } = responseCalculation.data;
+      // const { data } = responseCalculation;
 
-      console.log("[Detail] getDetail(responseCalculation): ", { data });
-      const responseResult = await MinskaApi.getCalculationResult(calculationId);
+      // console.log("[Detail] getDetail(responseCalculation): ", { data });
+      // const responseResult = await MinskaApi.getCalculationResult(calculationId);
 
-      console.log("[Detail] getDetail(responseResult): ", { data: responseResult.data });
-      const resultData = responseResult.data;
+      // console.log("[Detail] getDetail(responseResult): ", { data: responseResult.data });
+      // const resultData = responseResult.data;
 
-      const detail: HistoryItem = {
-        id,
-        title: name,
-        emission: resultData.totalCarbonFootprint,
-        type,
-        dateISO: getDateISO(),
-      };
+      // const detail: HistoryItem = {
+      //   id,
+      //   title: name,
+      //   emission: resultData.totalCarbonFootprint,
+      //   type,
+      //   dateISO: getDateISO(),
+      // };
       setDetail(detail);
-      saveDetailOnHistory(detail);
+      // saveDetailOnHistory(detail);
     } catch (error) {
       console.error("[Detail|ERROR]: ", error);
       notify("Erro inesperado, tente novamente mais tarde.");
@@ -83,7 +83,7 @@ export default function Detail({ route, navigation }: any) {
       id: new Date().toISOString(),
       title: isRecipe ? "Compota de abacaxi" : "Banana",
       emission: isRecipe ? 50 : 4.5,
-      type: isRecipe ? "recipe" : "product",
+      type: isRecipe ? "Recipe" : "Product",
       dateISO: getDateISO(),
     };
     setDetail(detail);

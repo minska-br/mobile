@@ -14,7 +14,7 @@ import Title from "../components/Title";
 import { SessionContext } from "../contexts/SessionContext";
 import { Ionicons } from "@expo/vector-icons";
 import EmissionText from "../components/EmissionText";
-import StorageService from "../services/StorageService";
+import StorageService from "../services/HistoryService";
 import HistoryItem from "../interfaces/HistoryItem";
 import notify from "../helpers/notify";
 import RoutesEnum from "../enums/routes";
@@ -112,17 +112,22 @@ export default function History({ navigation }: any) {
     setLoadingStatus(false);
   };
 
-  const navigateToHome = () => {
+  const backNavigationHandler = () => {
     navigation.navigate(RoutesEnum.Home);
     return true; // Just to use as back click without type problems
   };
 
   useEffect(() => {
-    const backHandler = BackHandler.addEventListener("hardwareBackPress", navigateToHome);
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", backNavigationHandler);
     return () => backHandler.remove();
   }, []);
 
+  const wipeData = async () => {
+    await StorageService.clear();
+  };
+
   useEffect(() => {
+    // wipeData();
     getList();
   }, []);
 

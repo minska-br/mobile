@@ -14,15 +14,14 @@ import { SessionContext } from "../contexts/SessionContext";
 import notify from "../helpers/notify";
 import getRandomItemFromArray from "../helpers/getRandomItemFromArray";
 import products from "../constants/products";
-import MinskaApi from "../services/MinskaApi";
-import StorageService from "../services/HistoryService";
+import MinskaService from "../services/MinskaService";
 
 export default function Search({ navigation }: any) {
   const { activeFluxType } = useContext(SessionContext);
   const isRecipeFlux = activeFluxType === "Recipe";
 
   const inputref = useRef<TextInput>(null);
-  const [inputValue, setInputValue] = useState("Churros");
+  const [inputValue, setInputValue] = useState("Batata");
   const { setLoadingStatus } = useContext(SessionContext);
 
   const clearInput = () => setInputValue("");
@@ -52,10 +51,13 @@ export default function Search({ navigation }: any) {
   const searchProduct = async () => {
     console.log("\n[Search] searchProduct");
 
-    // const response = await MinskaApi.scheduleProductCalculation(inputValue);
+    // const response: any = await MinskaApi.scheduleProductCalculation(inputValue);
     // const calculationId = response?.data?.calculationId;
-    // console.log("[Search] handleSearch: ", { calculationId });
-    navigation.navigate(RoutesEnum.CalculatingEmptyState);
+
+    // console.log("\n[Search] handleSearch: ", { calculationId });
+
+    // navigation.navigate(RoutesEnum.CalculatingEmptyState);
+    setLoadingStatus(false);
   };
 
   const handleSearch = async () => {
@@ -63,13 +65,24 @@ export default function Search({ navigation }: any) {
     // notify(`Search: ${inputValue}`, true);
     console.log("\n[Search] handleSearch", isRecipeFlux);
 
-    if (isRecipeFlux) {
-      await searchRecipe();
+    const searchedItem = await MinskaService.getExistingItemByName(inputValue.trim());
+    console.log("\n[Search] handleSearch: ", { searchedItem, exists: Boolean(searchedItem) });
+
+    if (Boolean(searchedItem)) {
+      // Navigate to detail screen
     } else {
-      await searchProduct();
+      // Schedule product calculation or go to list results
     }
 
     fakeDelay(clearInput, 3);
+  };
+
+  const searchItem = () => {
+    if (isRecipeFlux) {
+      searchRecipe();
+    } else {
+      searchProduct();
+    }
   };
 
   const openKeyboardOnLoad = () => {

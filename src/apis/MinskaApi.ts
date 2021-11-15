@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 
 import {
   URL_BASE_CALCULATOR,
@@ -16,10 +16,21 @@ const headers = {
   "Content-Type": "application/json",
   "Access-Control-Allow-Origin": "*",
 };
-const apiCrawler = axios.create({ baseURL: URL_BASE_CRAWLER, headers });
+
+interface IResponse {
+  requestId: string;
+  calculationId: string;
+  name: string;
+  href: string;
+  method: string;
+  startTime: string;
+  endTime: string;
+  status: string;
+}
 
 class MinskaApi {
   private static apiCalculator = axios.create({ baseURL: URL_BASE_CALCULATOR, headers });
+  private static apiCrawler = axios.create({ baseURL: URL_BASE_CRAWLER, headers });
 
   static async getProductList(searchedProduct: string) {
     logging(PRODUCT_LIST_ENDPOINT, { searchedProduct });
@@ -28,37 +39,27 @@ class MinskaApi {
     const apiCrawler = await axios.create({ baseURL: URL_BASE_CRAWLER, headers });
 
     const res = await apiCrawler.get("");
-    console.log("[MinskaApi] isAlive", res);
+    console.log("\n[MinskaApi] isAlive", res);
 
     const resp = await apiCrawler.get(PRODUCT_LIST_ENDPOINT, { params });
-    console.log("[MinskaApi] getProductList", resp?.data);
+    console.log("\n[MinskaApi] getProductList", resp?.data);
 
     return resp;
   }
 
-  private static startCalculation = async (
+  static startCalculation = async (
     recipeId: number | null,
     foodName: string,
     type: CalculationType,
     amount: number = 1
-  ) => {
+  ): Promise<AxiosResponse<IResponse, any>> => {
     const body = { foodName, type, recipeId, amount };
-    logging(START_CALCULATION_ENDPOINT, { body });
+    console.log("\n[MinskaApi] startCalculation", { body });
     return this.apiCalculator.post(START_CALCULATION_ENDPOINT, body);
   };
 
-  static scheduleProductCalculation = async (foodName: string) => {
-    return this.startCalculation(null, foodName, "Product");
-  };
-
-  static scheduleRecipeCalculation = async (recipeId: number, foodName: string) => {
-    return this.startCalculation(recipeId, foodName, "Product");
-  };
-
-  static getCalculationResult = async (calculationId: string) => {
-    const url = `${CALCULATION_RESULT_ENDPOINT}/${calculationId}`;
-    logging(url);
-    return this.apiCalculator.get(url);
+  static getAllRequests = async (): Promise<AxiosResponse<IResponse[], any>> => {
+    return this.apiCalculator.get(CALCULATION_RESULT_ENDPOINT);
   };
 }
 

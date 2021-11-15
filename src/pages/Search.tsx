@@ -15,13 +15,14 @@ import notify from "../helpers/notify";
 import getRandomItemFromArray from "../helpers/getRandomItemFromArray";
 import products from "../constants/products";
 import MinskaApi from "../services/MinskaApi";
+import StorageService from "../services/HistoryService";
 
 export default function Search({ navigation }: any) {
   const { activeFluxType } = useContext(SessionContext);
   const isRecipeFlux = activeFluxType === "Recipe";
 
   const inputref = useRef<TextInput>(null);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState("Churros");
   const { setLoadingStatus } = useContext(SessionContext);
 
   const clearInput = () => setInputValue("");
@@ -32,30 +33,42 @@ export default function Search({ navigation }: any) {
     else return getRandomItemFromArray(products);
   };
 
-  const navigateToNextScreen = () => {
-    const { SearchResult, CalculatingEmptyState } = RoutesEnum;
-    const nextScreen = isRecipeFlux ? SearchResult : CalculatingEmptyState;
+  // const navigateToNextScreen = () => {
+  //   const { SearchResult, CalculatingEmptyState } = RoutesEnum;
+  //   const nextScreen = isRecipeFlux ? SearchResult : CalculatingEmptyState;
+  //   const seachItem = { name: inputValue };
+  //   const params = { seachItem, activeFluxType };
+  //   navigation.navigate(nextScreen, params);
+  // };
+
+  const searchRecipe = async () => {
+    console.log("\n[Search] searchRecipe");
+
     const seachItem = { name: inputValue };
-    const params = { seachItem, activeFluxType };
-    navigation.navigate(nextScreen, params);
+    const params = { seachItem };
+    navigation.navigate(RoutesEnum.SearchResult, params);
+  };
+
+  const searchProduct = async () => {
+    console.log("\n[Search] searchProduct");
+
+    // const response = await MinskaApi.scheduleProductCalculation(inputValue);
+    // const calculationId = response?.data?.calculationId;
+    // console.log("[Search] handleSearch: ", { calculationId });
+    navigation.navigate(RoutesEnum.CalculatingEmptyState);
   };
 
   const handleSearch = async () => {
     setLoadingStatus(true);
-    notify(`Search: ${inputValue}`, true);
-    const seachItem = { name: inputValue };
+    // notify(`Search: ${inputValue}`, true);
+    console.log("\n[Search] handleSearch", isRecipeFlux);
 
     if (isRecipeFlux) {
-      const params = { seachItem };
-      navigation.navigate(RoutesEnum.SearchResult, params);
+      await searchRecipe();
     } else {
-      const response = await MinskaApi.startCalculation(null, seachItem.name, "product");
-      console.log("[Search] handleSearch: ", { response });
-
-      navigation.navigate(RoutesEnum.CalculatingEmptyState);
+      await searchProduct();
     }
 
-    navigateToNextScreen();
     fakeDelay(clearInput, 3);
   };
 

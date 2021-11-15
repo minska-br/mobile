@@ -9,23 +9,34 @@ import {
 } from "../../env.json";
 import CalculationType from "../types/CalculationType";
 
-const headers = { "Access-Control-Allow-Origin": "*" };
-
-const apiCrawler = axios.create({ baseURL: URL_BASE_CRAWLER, headers });
-const apiCalculator = axios.create({ baseURL: URL_BASE_CALCULATOR, headers });
-
 const logging = (endpoint: string, params?: any) =>
   console.log(`\n[MinskaApi/${endpoint}]: `, params);
+const headers = {
+  Accept: "application/json",
+  "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": "*",
+};
+const apiCrawler = axios.create({ baseURL: URL_BASE_CRAWLER, headers });
 
 class MinskaApi {
-  static getProductList = async (searchedProduct: string) => {
-    logging(PRODUCT_LIST_ENDPOINT, { searchedProduct });
-    return apiCrawler.get(PRODUCT_LIST_ENDPOINT, {
-      params: { value: searchedProduct },
-    });
-  };
+  private static apiCalculator = axios.create({ baseURL: URL_BASE_CALCULATOR, headers });
 
-  static startCalculation = async (
+  static async getProductList(searchedProduct: string) {
+    logging(PRODUCT_LIST_ENDPOINT, { searchedProduct });
+    const params = { value: searchedProduct };
+
+    const apiCrawler = await axios.create({ baseURL: URL_BASE_CRAWLER, headers });
+
+    const res = await apiCrawler.get("");
+    console.log("[MinskaApi] isAlive", res);
+
+    const resp = await apiCrawler.get(PRODUCT_LIST_ENDPOINT, { params });
+    console.log("[MinskaApi] getProductList", resp?.data);
+
+    return resp;
+  }
+
+  private static startCalculation = async (
     recipeId: number | null,
     foodName: string,
     type: CalculationType,
@@ -33,13 +44,21 @@ class MinskaApi {
   ) => {
     const body = { foodName, type, recipeId, amount };
     logging(START_CALCULATION_ENDPOINT, { body });
-    return apiCalculator.post(START_CALCULATION_ENDPOINT, body);
+    return this.apiCalculator.post(START_CALCULATION_ENDPOINT, body);
+  };
+
+  static scheduleProductCalculation = async (foodName: string) => {
+    return this.startCalculation(null, foodName, "Product");
+  };
+
+  static scheduleRecipeCalculation = async (recipeId: number, foodName: string) => {
+    return this.startCalculation(recipeId, foodName, "Product");
   };
 
   static getCalculationResult = async (calculationId: string) => {
     const url = `${CALCULATION_RESULT_ENDPOINT}/${calculationId}`;
     logging(url);
-    return apiCalculator.get(url);
+    return this.apiCalculator.get(url);
   };
 }
 

@@ -21,7 +21,7 @@ export default function Search({ navigation }: any) {
   const isRecipeFlux = activeFluxType === "Recipe";
 
   const inputref = useRef<TextInput>(null);
-  const [inputValue, setInputValue] = useState("Batata");
+  const [inputValue, setInputValue] = useState("Banana");
   const { setLoadingStatus } = useContext(SessionContext);
 
   const clearInput = () => setInputValue("");
@@ -69,12 +69,18 @@ export default function Search({ navigation }: any) {
     console.log("\n[Search] handleSearch: ", { searchedItem, exists: Boolean(searchedItem) });
 
     if (Boolean(searchedItem)) {
-      // Navigate to detail screen
+      navigateToDetailWithExistingItem(searchedItem);
     } else {
       // Schedule product calculation or go to list results
     }
 
     fakeDelay(clearInput, 3);
+  };
+
+  const navigateToDetailWithExistingItem = (searchedItem: any) => {
+    console.log("\n[Search] navigateToDetailWithExistingItem");
+    const params = { calculationId: searchedItem?.calculationId };
+    navigation.navigate(RoutesEnum.Detail, params);
   };
 
   const searchItem = () => {

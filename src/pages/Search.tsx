@@ -119,7 +119,7 @@ export default function Search({ navigation }: any) {
         ref={inputref}
         placeholder={`Ex: ${getPlaceholder()}`}
         style={styles.searchInput}
-        onChangeText={(text) => setInputValue(text.trim())}
+        onChangeText={(text) => setInputValue(text)}
         value={inputValue}
       ></TextInput>
       <Button disabled={inputValue.length <= 0} onPress={handleSearch}>

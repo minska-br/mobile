@@ -1,6 +1,4 @@
-import React, { useContext } from "react";
-import { useEffect } from "react";
-import { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Button from "../components/Button";
 import Container from "../components/Container";
@@ -11,8 +9,8 @@ import RoutesEnum from "../enums/routes";
 import getDateISO from "../helpers/getDateISO";
 import notify from "../helpers/notify";
 import HistoryItem from "../interfaces/HistoryItem";
-import MinskaApi from "../services/MinskaApi";
 import StorageService from "../services/HistoryService";
+import MinskaService from "../services/MinskaService";
 import ActiveFluxType from "../types/ActiveFluxType";
 
 export default function Detail({ route, navigation }: any) {
@@ -37,43 +35,67 @@ export default function Detail({ route, navigation }: any) {
 
   const saveDetailOnHistory = async (item: HistoryItem) => {
     const key = `history-${getDateISO()}`;
-    console.log("[Detail] saveDetailOnHistory:", key);
+    console.log("\n[Detail] saveDetailOnHistory:", key);
     try {
       await StorageService.setObjectItem(key, item);
     } catch (error) {
-      console.log("[Detail|ERROR] saveDetailOnHistory: ", error);
+      console.log("\n[Detail|ERROR] saveDetailOnHistory: ", error);
     }
   };
 
   const getCalculation = async (activeFluxType: ActiveFluxType) => {
-    try {
-      console.log("[Detail] getCalculation: ", seachItem);
+    const seachItem = route.params?.seachItem;
+    console.log("\n[Detail] getCalculation: ", route.params);
 
-      // const { id, name } = seachItem;
-      // const type = activeFluxType === "Recipe" ? "recipe" : "product";
-      // const responseCalculation = await MinskaApi.startCalculation(id, name, type);
-      // const { calculationId } = responseCalculation.data;
-      // const { data } = responseCalculation;
+    const calculationId = route.params?.calculationId;
+    if (calculationId) {
+      setDetailByCalculationId(calculationId);
+    }
+    setLoadingStatus(false);
 
-      // console.log("[Detail] getDetail(responseCalculation): ", { data });
-      // const responseResult = await MinskaApi.getCalculationResult(calculationId);
+    // try {
+    // const { id, name } = seachItem;
+    // const type = activeFluxType === "Recipe" ? "recipe" : "product";
+    // const responseCalculation = await MinskaApi.startCalculation(id, name, type);
+    // const { calculationId } = responseCalculation.data;
+    // const { data } = responseCalculation;
 
-      // console.log("[Detail] getDetail(responseResult): ", { data: responseResult.data });
-      // const resultData = responseResult.data;
+    // console.log("[Detail] getDetail(responseCalculation): ", { data });
+    // const responseResult = await MinskaApi.getCalculationResult(calculationId);
 
-      // const detail: HistoryItem = {
-      //   id,
-      //   title: name,
-      //   emission: resultData.totalCarbonFootprint,
-      //   type,
-      //   dateISO: getDateISO(),
-      // };
-      setDetail(detail);
-      // saveDetailOnHistory(detail);
-    } catch (error) {
-      console.error("[Detail|ERROR]: ", error);
-      notify("Erro inesperado, tente novamente mais tarde.");
-      navigation.navigate(RoutesEnum.Home);
+    // console.log("[Detail] getDetail(responseResult): ", { data: responseResult.data });
+    // const resultData = responseResult.data;
+
+    // const detail: HistoryItem = {
+    //   id,
+    //   title: name,
+    //   emission: resultData.totalCarbonFootprint,
+    //   type,
+    //   dateISO: getDateISO(),
+    // };
+    // setDetail(detail);
+    // saveDetailOnHistory(detail);
+    // } catch (error) {
+    //   console.error("[Detail|ERROR]: ", error);
+    //   notify("Erro inesperado, tente novamente mais tarde.");
+    //   navigation.navigate(RoutesEnum.Home);
+    // }
+  };
+
+  const setDetailByCalculationId = async (calculationId: string) => {
+    const calculation = await MinskaService.getCalculation(calculationId);
+    console.log("\n[Detail] getCalculation(calculation): ", calculation);
+    if (calculation) {
+      const newDetail: HistoryItem = {
+        dateISO: getDateISO(),
+        emission: calculation.totalCarbonFootprint,
+        id: calculationId,
+        title: calculation.name,
+        type: calculation.processes.length === 1 ? "Product" : "Recipe",
+      };
+      console.log("\n[Detail] getCalculation(newDetail): ", newDetail);
+
+      setDetail(newDetail);
     }
   };
 
@@ -94,8 +116,6 @@ export default function Detail({ route, navigation }: any) {
 
     if (activeFluxType) await getCalculation(activeFluxType);
     else mockedSetup();
-
-    setLoadingStatus(false);
   };
 
   const loadDetail = () => {

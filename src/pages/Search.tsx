@@ -21,7 +21,7 @@ export default function Search({ navigation }: any) {
   const isRecipeFlux = activeFluxType === "Recipe";
 
   const inputref = useRef<TextInput>(null);
-  const [inputValue, setInputValue] = useState("Banana");
+  const [inputValue, setInputValue] = useState("Tomilho");
   const { setLoadingStatus } = useContext(SessionContext);
 
   const clearInput = () => setInputValue("");
@@ -48,15 +48,14 @@ export default function Search({ navigation }: any) {
     navigation.navigate(RoutesEnum.SearchResult, params);
   };
 
-  const searchProduct = async () => {
-    console.log("\n[Search] searchProduct");
+  const scheduleProductCalculation = async () => {
+    console.log("\n[Search] scheduleProductCalculation: ", { inputValue });
 
-    // const response: any = await MinskaApi.scheduleProductCalculation(inputValue);
-    // const calculationId = response?.data?.calculationId;
+    const calculationId = await MinskaService.scheduleProductCalculation(inputValue);
 
-    // console.log("\n[Search] handleSearch: ", { calculationId });
+    console.log("\n[Search] scheduleProductCalculation: ", { calculationId });
 
-    // navigation.navigate(RoutesEnum.CalculatingEmptyState);
+    navigation.navigate(RoutesEnum.CalculatingEmptyState);
     setLoadingStatus(false);
   };
 
@@ -65,13 +64,13 @@ export default function Search({ navigation }: any) {
     // notify(`Search: ${inputValue}`, true);
     console.log("\n[Search] handleSearch", isRecipeFlux);
 
-    const searchedItem = await MinskaService.getExistingItemByName(inputValue.trim());
+    const searchedItem = await MinskaService.getExistingItemByName(inputValue);
     console.log("\n[Search] handleSearch: ", { searchedItem, exists: Boolean(searchedItem) });
 
     if (Boolean(searchedItem)) {
       navigateToDetailWithExistingItem(searchedItem);
     } else {
-      // Schedule product calculation or go to list results
+      initCalculation();
     }
 
     fakeDelay(clearInput, 3);
@@ -83,11 +82,11 @@ export default function Search({ navigation }: any) {
     navigation.navigate(RoutesEnum.Detail, params);
   };
 
-  const searchItem = () => {
+  const initCalculation = () => {
     if (isRecipeFlux) {
-      searchRecipe();
+      // searchRecipe();
     } else {
-      searchProduct();
+      scheduleProductCalculation();
     }
   };
 
@@ -107,7 +106,7 @@ export default function Search({ navigation }: any) {
         ref={inputref}
         placeholder={`Ex: ${getPlaceholder()}`}
         style={styles.searchInput}
-        onChangeText={(text) => setInputValue(text)}
+        onChangeText={(text) => setInputValue(text.trim())}
         value={inputValue}
       ></TextInput>
       <Button disabled={inputValue.length <= 0} onPress={handleSearch}>

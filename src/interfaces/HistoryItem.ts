@@ -4,6 +4,6 @@ export default interface HistoryItem {
   id: string;
   type: CalculationType;
   title: string;
-  emission: number;
+  emission: number | null;
   dateISO: string;
 }

@@ -17,7 +17,7 @@ const headers = {
   "Access-Control-Allow-Origin": "*",
 };
 
-interface IResponse {
+interface IRequestResponse {
   requestId: string;
   calculationId: string;
   name: string;
@@ -26,6 +26,31 @@ interface IResponse {
   startTime: string;
   endTime: string;
   status: string;
+}
+
+interface IConversion     {
+  name: string,
+  value: number,
+  unit: string
+}
+
+interface IProcess     {
+  name: string,
+  value: number,
+  unit: string,
+  amount: number,
+  processNameFound: string,
+  calculated: boolean
+}
+
+interface ICalculationResponse {
+  id: string,
+  name: string,
+  unit: string,
+  calculatedPercentage: number,
+  totalCarbonFootprint: number,
+  processes: IProcess[],
+  conversions: IConversion[]
 }
 
 class MinskaApi {
@@ -52,14 +77,21 @@ class MinskaApi {
     foodName: string,
     type: CalculationType,
     amount: number = 1
-  ): Promise<AxiosResponse<IResponse, any>> => {
+  ): Promise<AxiosResponse<IRequestResponse, any>> => {
     const body = { foodName, type, recipeId, amount };
     console.log("\n[MinskaApi] startCalculation", { body });
     return this.apiCalculator.post(START_CALCULATION_ENDPOINT, body);
   };
 
-  static getAllRequests = async (): Promise<AxiosResponse<IResponse[], any>> => {
+  static getAllRequests = async (): Promise<AxiosResponse<IRequestResponse[], any>> => {
     return this.apiCalculator.get(CALCULATION_RESULT_ENDPOINT);
+  };
+
+  static findCalculation = async (
+    calculationId: string
+  ): Promise<AxiosResponse<ICalculationResponse, any>> => {
+    console.log("\n[MinskaApi] findCalculation: ", { calculationId });
+    return this.apiCalculator.get(`${START_CALCULATION_ENDPOINT}/${calculationId}`);
   };
 }
 

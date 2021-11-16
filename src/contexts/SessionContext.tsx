@@ -23,7 +23,7 @@ export default function SessionContextProvider({ children }: SessionContextProvi
   }
 
   function setActiveFluxType(value: ActiveFluxType) {
-    console.log("[SessionContextProvider]: setActiveFluxType", value);
+    console.log("\n[SessionContextProvider]: setActiveFluxType", value);
 
     setActiveFluxTypeState(value);
   }

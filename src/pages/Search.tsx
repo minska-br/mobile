@@ -15,6 +15,9 @@ import notify from "../helpers/notify";
 import getRandomItemFromArray from "../helpers/getRandomItemFromArray";
 import products from "../constants/products";
 import MinskaService from "../services/MinskaService";
+import HistoryItem from "../interfaces/HistoryItem";
+import getDateISO from "../helpers/getDateISO";
+import HistoryService from "../services/HistoryService";
 
 export default function Search({ navigation }: any) {
   const { activeFluxType } = useContext(SessionContext);
@@ -51,12 +54,22 @@ export default function Search({ navigation }: any) {
   const scheduleProductCalculation = async () => {
     console.log("\n[Search] scheduleProductCalculation: ", { inputValue });
 
-    const calculationId = await MinskaService.scheduleProductCalculation(inputValue);
-
-    console.log("\n[Search] scheduleProductCalculation: ", { calculationId });
-
-    navigation.navigate(RoutesEnum.CalculatingEmptyState);
-    setLoadingStatus(false);
+    try {
+      const calculationId = await MinskaService.scheduleProductCalculation(inputValue);
+      const schedulingItem: HistoryItem = {
+        id: String(calculationId),
+        title: inputValue,
+        type: "Product",
+        emission: null,
+        dateISO: getDateISO(),
+      };
+      await HistoryService.saveScheduling(schedulingItem);
+      navigation.navigate(RoutesEnum.CalculatingEmptyState);
+    } catch (error) {
+      notify("Erro inesperado, tente novamente mais tarde");
+      console.error("[Search] scheduleProductCalculation | ERROR: " + JSON.stringify(error));
+      navigation.navigate(RoutesEnum.Home);
+    }
   };
 
   const handleSearch = async () => {

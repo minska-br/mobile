@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useContext } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Button from "../components/Button";
@@ -9,7 +9,7 @@ import RoutesEnum from "../enums/routes";
 import ActiveFluxType from "../types/ActiveFluxType";
 
 export default function Home({ navigation }: any) {
-  const { setActiveFluxType } = useContext(SessionContext);
+  const { setActiveFluxType, setLoadingStatus } = useContext(SessionContext);
 
   const handleHistoryPress = () => navigation.navigate(RoutesEnum.History);
 
@@ -17,6 +17,10 @@ export default function Home({ navigation }: any) {
     setActiveFluxType(activeFluxType);
     navigation.navigate(RoutesEnum.Search);
   };
+
+  const disableLoading = () => setLoadingStatus(false);
+
+  useEffect(disableLoading, []);
 
   return (
     <Container centralized>

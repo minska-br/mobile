@@ -24,7 +24,7 @@ export default function Search({ navigation }: any) {
   const isRecipeFlux = activeFluxType === "Recipe";
 
   const inputref = useRef<TextInput>(null);
-  const [inputValue, setInputValue] = useState("Frango assado");
+  const [inputValue, setInputValue] = useState("");
   const { setLoadingStatus } = useContext(SessionContext);
 
   const clearInput = () => setInputValue("");

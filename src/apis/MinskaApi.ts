@@ -4,7 +4,7 @@ import {
   URL_BASE_CALCULATOR,
   URL_BASE_CRAWLER,
   START_CALCULATION_ENDPOINT,
-  PRODUCT_LIST_ENDPOINT,
+  RECIPES_LIST_ENDPOINT,
   CALCULATION_RESULT_ENDPOINT,
 } from "../../env.json";
 import CalculationType from "../types/CalculationType";
@@ -28,49 +28,39 @@ interface IRequestResponse {
   status: string;
 }
 
-interface IConversion     {
-  name: string,
-  value: number,
-  unit: string
+interface IConversion {
+  name: string;
+  value: number;
+  unit: string;
 }
 
-interface IProcess     {
-  name: string,
-  value: number,
-  unit: string,
-  amount: number,
-  processNameFound: string,
-  calculated: boolean
+interface IProcess {
+  name: string;
+  value: number;
+  unit: string;
+  amount: number;
+  processNameFound: string;
+  calculated: boolean;
 }
 
 interface ICalculationResponse {
-  id: string,
-  name: string,
-  unit: string,
-  calculatedPercentage: number,
-  totalCarbonFootprint: number,
-  processes: IProcess[],
-  conversions: IConversion[]
+  id: string;
+  name: string;
+  unit: string;
+  calculatedPercentage: number;
+  totalCarbonFootprint: number;
+  processes: IProcess[];
+  conversions: IConversion[];
+}
+
+interface IRecipesListItemResponse {
+  id: number;
+  name: string;
 }
 
 class MinskaApi {
   private static apiCalculator = axios.create({ baseURL: URL_BASE_CALCULATOR, headers });
   private static apiCrawler = axios.create({ baseURL: URL_BASE_CRAWLER, headers });
-
-  static async getProductList(searchedProduct: string) {
-    logging(PRODUCT_LIST_ENDPOINT, { searchedProduct });
-    const params = { value: searchedProduct };
-
-    const apiCrawler = await axios.create({ baseURL: URL_BASE_CRAWLER, headers });
-
-    const res = await apiCrawler.get("");
-    console.log("\n[MinskaApi] isAlive", res);
-
-    const resp = await apiCrawler.get(PRODUCT_LIST_ENDPOINT, { params });
-    console.log("\n[MinskaApi] getProductList", resp?.data);
-
-    return resp;
-  }
 
   static startCalculation = async (
     recipeId: number | null,
@@ -92,6 +82,14 @@ class MinskaApi {
   ): Promise<AxiosResponse<ICalculationResponse, any>> => {
     console.log("\n[MinskaApi] findCalculation: ", { calculationId });
     return this.apiCalculator.get(`${START_CALCULATION_ENDPOINT}/${calculationId}`);
+  };
+
+  static getRecipesList = async (
+    recipeName: string
+  ): Promise<AxiosResponse<IRecipesListItemResponse[], any>> => {
+    console.log("\n[MinskaApi] getRecipesList: ", { recipeName });
+    const params = { value: recipeName };
+    return this.apiCrawler.get(RECIPES_LIST_ENDPOINT, { params });
   };
 }
 

@@ -1,4 +1,4 @@
-const INIT = "@Minska:";
+const INIT = "@Minska:History:";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import HistoryItem from "../interfaces/HistoryItem";
 
@@ -15,9 +15,15 @@ export default class HistoryService {
     await AsyncStorage.setItem(key, value);
   };
 
-  static getAllKeys = async () => {
-    logging("getAllKeys");
-    return await AsyncStorage.getAllKeys();
+  static getHistory = async () => {
+    const keys = await AsyncStorage.getAllKeys();
+    const historyKeys = keys.filter((key) => key.startsWith(INIT));
+    const historyPairs = await AsyncStorage.multiGet(historyKeys);
+    const historyItems = historyPairs
+      .filter(([_key, value]) => Boolean(value))
+      .map(([_key, value]) => JSON.parse(String(value)) as HistoryItem);
+
+    return historyItems;
   };
 
   static getMultiple = async (keys: string[]) => {

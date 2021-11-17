@@ -15,6 +15,13 @@ export default class HistoryService {
     await AsyncStorage.setItem(key, value);
   };
 
+  static updateHistoryItem = async (item: HistoryItem) => {
+    const key = this.getKey(item.id);
+    const value = JSON.stringify(item);
+    logging("updateHistoryItem", { key, value });
+    await AsyncStorage.setItem(key, value);
+  };
+
   static getHistory = async () => {
     const keys = await AsyncStorage.getAllKeys();
     const historyKeys = keys.filter((key) => key.startsWith(INIT));

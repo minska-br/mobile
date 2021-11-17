@@ -7,20 +7,42 @@ import Title from "../components/Title";
 import RoutesEnum from "../enums/routes";
 import { SessionContext } from "../contexts/SessionContext";
 import Container from "../components/Container";
-import MinskaApi from "../apis/MinskaApi";
-import axios, { AxiosResponse } from "axios";
 import notify from "../helpers/notify";
+import HistoryService from "../services/HistoryService";
+import HistoryItem from "../interfaces/HistoryItem";
+import MinskaService from "../services/MinskaService";
+import getDateISO from "../helpers/getDateISO";
 
 export default function SearchResult({ route, navigation }: any) {
   const [data, setData] = useState<any>([]);
   const { activeFluxType, setLoadingStatus } = useContext(SessionContext);
-  const { seachItem } = route.params;
+
+  const scheduleRecipeCalculation = async (recipeId: number, recipeName: string) => {
+    console.log("\n[SearchResult] scheduleRecipeCalculation: ", { recipeId, recipeName });
+
+    try {
+      const calculationId = await MinskaService.scheduleRecipeCalculation(recipeId, recipeName);
+      const schedulingItem: HistoryItem = {
+        id: String(calculationId),
+        title: recipeName,
+        type: "Recipe",
+        emission: null,
+        dateISO: getDateISO(),
+      };
+      await HistoryService.saveScheduling(schedulingItem);
+      navigation.navigate(RoutesEnum.CalculatingEmptyState);
+    } catch (error: any) {
+      notify("Erro inesperado, tente novamente mais tarde");
+      console.log("[SearchResult | ERROR] scheduleRecipeCalculation: " + error.message);
+      navigation.navigate(RoutesEnum.Home);
+    }
+  };
 
   const renderItem = ({ item }: any) => {
     const onPressItem = () => {
       setLoadingStatus(true);
       console.log("\n[SearchResult] renderItem(item)", item);
-      navigation.navigate(RoutesEnum.CalculatingEmptyState);
+      scheduleRecipeCalculation(item.id, item.name);
     };
 
     return (
@@ -30,32 +52,13 @@ export default function SearchResult({ route, navigation }: any) {
     );
   };
 
-  const getList = async () => {
-    let response!: any;
-    // let response!: AxiosResponse<any> | undefined;
-    try {
-      // response = await MinskaApi.getProductList(seachItem.name.trim());
-      const url = `http://127.0.0.1:4390/recipes/allrecipes?value=${seachItem.name.trim()}`;
-      console.log("\n[SearchResult] getList", { url });
-
-      response = await MinskaApi.getProductList(seachItem.name.trim());
-
-      console.log("\n[SearchResult] getList(response): ", response);
-      // const data = response?.data;
-      // setData(data);
-      setLoadingStatus(false);
-    } catch (error) {
-      console.error("[SearchResult] getList: ", error);
-      notify("Erro inesperado, tente novamente mais tarde.");
-      setLoadingStatus(false);
-    }
-  };
-
   const loadList = () => {
-    getList();
+    const { recipesList } = route.params;
+    setData(recipesList);
+    setLoadingStatus(false);
   };
 
-  useEffect(loadList, [seachItem]);
+  useEffect(loadList, []);
 
   return (
     <Container>

@@ -18,6 +18,7 @@ import StorageService from "../services/HistoryService";
 import HistoryItem from "../interfaces/HistoryItem";
 import notify from "../helpers/notify";
 import RoutesEnum from "../enums/routes";
+import HistoryService from "../services/HistoryService";
 
 export default function History({ navigation }: any) {
   const NOT_SELECTED_ID = "none";
@@ -80,36 +81,44 @@ export default function History({ navigation }: any) {
           <Text style={[styles.itemText, activeTextStyle]}>
             {item.title.length > 15 ? item.title?.substring(0, 15).trim() + "..." : item.title}
           </Text>
-          <EmissionText
-            value={item?.emission ?? 0}
-            fontSize={20}
-            color={isSelected ? "#fff" : undefined}
-          />
+          {item.emission == null ? (
+            <Text style={styles.itemType}>Calculando...</Text>
+          ) : (
+            <EmissionText
+              value={item?.emission ?? 0}
+              fontSize={20}
+              color={isSelected ? "#fff" : undefined}
+            />
+          )}
         </View>
       </TouchableOpacity>
     );
   };
 
   const getList = async () => {
-    try {
-      const keys = await StorageService.getAllKeys();
-      const onlyHistoryKeys = (key: string) => key.includes("history");
-      const filteredKeys = keys.filter(onlyHistoryKeys);
-      const historyValues = await StorageService.getMultiple(filteredKeys);
-      const historyData = historyValues.map(([key, value]) => {
-        if (value) {
-          const item = JSON.parse(value);
-          item.id = key;
-          return item;
-        }
-      });
-      setData(historyData);
-    } catch (error) {
-      console.error("[History|ERROR] getList: ", error);
-      notify("Erro inesperado, tente novamente mais tarde.");
-      navigation.navigate();
-    }
-    setLoadingStatus(false);
+    const items = await HistoryService.getHistory();
+    console.log("[History] getList: ", items);
+    if (items) setData(items);
+
+    // try {
+    //   const keys = await StorageService.getAllKeys();
+    //   const onlyHistoryKeys = (key: string) => key.includes("history");
+    //   const filteredKeys = keys.filter(onlyHistoryKeys);
+    //   const historyValues = await StorageService.getMultiple(filteredKeys);
+    //   const historyData = historyValues.map(([key, value]) => {
+    //     if (value) {
+    //       const item = JSON.parse(value);
+    //       item.id = key;
+    //       return item;
+    //     }
+    //   });
+    //   setData(historyData);
+    // } catch (error) {
+    //   console.error("[History|ERROR] getList: ", error);
+    //   notify("Erro inesperado, tente novamente mais tarde.");
+    //   navigation.navigate();
+    // }
+    // setLoadingStatus(false);
   };
 
   const backNavigationHandler = () => {
@@ -122,9 +131,9 @@ export default function History({ navigation }: any) {
     return () => backHandler.remove();
   }, []);
 
-  const wipeData = async () => {
-    await StorageService.clear();
-  };
+  // const wipeData = async () => {
+  //   await StorageService.clear();
+  // };
 
   useEffect(() => {
     // wipeData();

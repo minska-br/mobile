@@ -26,22 +26,6 @@ export default class HistoryService {
     return historyItems;
   };
 
-  static getMultiple = async (keys: string[]) => {
-    logging("getMultiple", { keys });
-    return await AsyncStorage.multiGet(keys);
-  };
-
-  static getObjectItem = async (key: string) => {
-    logging("getObjectItem", { key: this.getKey(key) });
-    const value = await AsyncStorage.getItem(this.getKey(key));
-    return value ? JSON.parse(value) : null;
-  };
-
-  static setObjectItem = async (key: string, obj: any) => {
-    logging("setObjectItem", { key: this.getKey(key), obj: JSON.stringify(obj) });
-    await AsyncStorage.setItem(this.getKey(key), JSON.stringify(obj));
-  };
-
   static deleteHistoryItem = async (historyItemId: string) => {
     const key = this.getKey(historyItemId);
     logging("deleteHistoryItem", { key });

@@ -41,7 +41,7 @@ class MinskaService {
   /**
    * This method returns the calculationId of the scheduled item.
    *
-   * @param foodName The name of the searched item (recipe or product)
+   * @param foodName The name of the searched product)
    * @returns calculationId
    */
   static scheduleProductCalculation = async (foodName: string) => {
@@ -51,8 +51,18 @@ class MinskaService {
     return data.calculationId;
   };
 
+  /**
+   * This method returns the calculationId of the scheduled item.
+   *
+   * @param recipeId The id of the recipe received before call the searchRecipes.
+   * @param foodName The name of the searched recipe.
+   * @returns calculationId
+   */
   static scheduleRecipeCalculation = async (recipeId: number, foodName: string) => {
-    return MinskaApi.startCalculation(recipeId, foodName, "Recipe");
+    console.log("\n[MinskaApi] scheduleRecipeCalculation", { foodName });
+    const response = await MinskaApi.startCalculation(recipeId, foodName, "Recipe");
+    const data = response.data;
+    return data.calculationId;
   };
 
   static searchRecipes = async (recipeName: string) => {

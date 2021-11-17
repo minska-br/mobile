@@ -24,10 +24,11 @@ export default function Search({ navigation }: any) {
   const isRecipeFlux = activeFluxType === "Recipe";
 
   const inputref = useRef<TextInput>(null);
-  const [inputValue, setInputValue] = useState("Tomilho");
+  const [inputValue, setInputValue] = useState("Frango assado");
   const { setLoadingStatus } = useContext(SessionContext);
 
   const clearInput = () => setInputValue("");
+
   const focusOnInputField = () => inputref.current?.focus();
 
   const getPlaceholder = () => {
@@ -43,12 +44,19 @@ export default function Search({ navigation }: any) {
   //   navigation.navigate(nextScreen, params);
   // };
 
-  const searchRecipe = async () => {
+  const listPossibleRecipes = async () => {
     console.log("\n[Search] searchRecipe");
 
-    const seachItem = { name: inputValue };
-    const params = { seachItem };
-    navigation.navigate(RoutesEnum.SearchResult, params);
+    try {
+      const recipesList = await MinskaService.searchRecipes(inputValue);
+      console.log("\n[Search] listPossibleRecipes: ", recipesList);
+      const params = { recipesList };
+      navigation.navigate(RoutesEnum.SearchResult, params);
+    } catch (error: any) {
+      notify("Erro inesperado, tente novamente mais tarde");
+      console.log("[Search | ERROR] scheduleProductCalculation : " + error.message);
+      navigation.navigate(RoutesEnum.Home);
+    }
   };
 
   const scheduleProductCalculation = async () => {
@@ -65,9 +73,9 @@ export default function Search({ navigation }: any) {
       };
       await HistoryService.saveScheduling(schedulingItem);
       navigation.navigate(RoutesEnum.CalculatingEmptyState);
-    } catch (error) {
+    } catch (error: any) {
       notify("Erro inesperado, tente novamente mais tarde");
-      console.error("[Search] scheduleProductCalculation | ERROR: " + JSON.stringify(error));
+      console.log("[Search] scheduleProductCalculation | ERROR: " + error.message);
       navigation.navigate(RoutesEnum.Home);
     }
   };
@@ -97,7 +105,7 @@ export default function Search({ navigation }: any) {
 
   const initCalculation = () => {
     if (isRecipeFlux) {
-      // searchRecipe();
+      listPossibleRecipes();
     } else {
       scheduleProductCalculation();
     }

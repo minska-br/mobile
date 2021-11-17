@@ -9,14 +9,12 @@ import RoutesEnum from "../enums/routes";
 import getDateISO from "../helpers/getDateISO";
 import notify from "../helpers/notify";
 import HistoryItem from "../interfaces/HistoryItem";
-import StorageService from "../services/HistoryService";
 import MinskaService from "../services/MinskaService";
 import ActiveFluxType from "../types/ActiveFluxType";
 
 export default function Detail({ route, navigation }: any) {
-  const { activeFluxType, setLoadingStatus } = useContext(SessionContext);
+  const { activeFluxType, setActiveFluxType, setLoadingStatus } = useContext(SessionContext);
   const [detail, setDetail] = useState<HistoryItem>();
-  const seachItem = route.params?.seachItem;
 
   const handleAnotherSearch = () => {
     navigation.navigate(RoutesEnum.Search);
@@ -44,13 +42,13 @@ export default function Detail({ route, navigation }: any) {
   };
 
   const getCalculation = async (activeFluxType: ActiveFluxType) => {
-    const seachItem = route.params?.seachItem;
     console.log("\n[Detail] getCalculation: ", route.params);
+    const detailItem = route.params?.detailItem;
 
-    const calculationId = route.params?.calculationId;
-    if (calculationId) {
-      setDetailByCalculationId(calculationId);
-    }
+    // const calculationId = route.params?.calculationId;
+    // if (calculationId) {
+    //   setDetailByCalculationId(calculationId);
+    // }
     setLoadingStatus(false);
 
     // try {
@@ -111,11 +109,17 @@ export default function Detail({ route, navigation }: any) {
     setDetail(detail);
   };
 
-  const getDetail = async () => {
+  const getDetail = () => {
     setLoadingStatus(true);
+    console.log("\n[Detail] getDetail: ", { activeFluxType });
+    const detailItem: HistoryItem = route.params?.detailItem;
 
-    if (activeFluxType) await getCalculation(activeFluxType);
-    else mockedSetup();
+    if (detailItem) {
+      console.log("\n[Detail] getDetail: ", { detailItem });
+      setActiveFluxType(detailItem.type);
+      setDetail(detailItem);
+      setLoadingStatus(false);
+    } else mockedSetup();
   };
 
   const loadDetail = () => {

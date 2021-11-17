@@ -32,8 +32,8 @@ class MinskaService {
       const response = await MinskaApi.findCalculation(calculationId);
       const data = response.data;
       return data;
-    } catch (error) {
-      console.error("\n[MinskaService] getCalculation | ERROR: " + JSON.stringify(error));
+    } catch (error: any) {
+      console.log("\n[MinskaService] getCalculation | ERROR: " + error.message);
       return null;
     }
   };
@@ -46,19 +46,20 @@ class MinskaService {
    */
   static scheduleProductCalculation = async (foodName: string) => {
     console.log("\n[MinskaApi] scheduleProductCalculation", { foodName });
-    try {
-      const response = await MinskaApi.startCalculation(null, foodName, "Product");
-      const data = response.data;
-      return data.calculationId;
-    } catch (error) {
-      console.error(
-        "\n[MinskaService] scheduleProductCalculation | ERROR: " + JSON.stringify(error)
-      );
-    }
+    const response = await MinskaApi.startCalculation(null, foodName, "Product");
+    const data = response.data;
+    return data.calculationId;
   };
 
   static scheduleRecipeCalculation = async (recipeId: number, foodName: string) => {
     return MinskaApi.startCalculation(recipeId, foodName, "Recipe");
+  };
+
+  static searchRecipes = async (recipeName: string) => {
+    console.log("\n[MinskaApi] searchRecipes", { recipeName });
+    const response = await MinskaApi.getRecipesList(recipeName);
+    const data = response.data;
+    return data;
   };
 }
 

@@ -42,7 +42,7 @@ export default function History({ navigation }: any) {
     } catch (error: any) {
       console.log("\nHistory|ERROR] deleteSelectedItem: " + error.message);
       notify("Erro inesperado, tente novamente mais tarde.");
-      navigation.navigate();
+      navigation.navigate(RoutesEnum.Home);
     }
   };
 
@@ -60,6 +60,14 @@ export default function History({ navigation }: any) {
       ],
       { cancelable: false }
     );
+  };
+
+  const handleDetailPress = () => {
+    const selectedItem = data.find((item) => item.id === selectedItemId);
+    console.log("\n[History] handleDetailPress: ", selectedItem);
+
+    const params = { detailItem: selectedItem };
+    navigation.navigate(RoutesEnum.Detail, params);
   };
 
   const renderItem = ({ item }: any) => {
@@ -219,10 +227,18 @@ export default function History({ navigation }: any) {
       <FlatList data={data} renderItem={renderItem} keyExtractor={(item) => item.id.toString()} />
 
       {selectedItemId !== NOT_SELECTED_ID && (
-        <View style={styles.trashButtonContainer}>
-          <TouchableOpacity style={styles.trashButton} onPress={handleTrashPress}>
-            <Ionicons name="md-trash-outline" color="white" size={30} />
-          </TouchableOpacity>
+        <View style={styles.bottomButtonsGroup}>
+          <View style={styles.trashButtonContainer}>
+            <TouchableOpacity style={styles.trashButton} onPress={handleTrashPress}>
+              <Ionicons name="md-trash-outline" color="white" size={30} />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.detailButtonContainer}>
+            <TouchableOpacity style={styles.trashButton} onPress={handleDetailPress}>
+              <Ionicons name="md-eye-outline" color="white" size={30} />
+            </TouchableOpacity>
+          </View>
         </View>
       )}
     </Container>
@@ -262,7 +278,23 @@ const styles = StyleSheet.create({
   trashButtonContainer: {
     flexDirection: "row-reverse",
   },
+  bottomButtonsGroup: {
+    display: "flex",
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
   trashButton: {
+    backgroundColor: "#444",
+    width: 48,
+    height: 48,
+    padding: 8,
+    borderRadius: 8,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  detailButtonContainer: {
     backgroundColor: "#444",
     width: 48,
     height: 48,

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 import Button from "../components/Button";
 import Container from "../components/Container";
 import EmissionText from "../components/EmissionText";
@@ -16,20 +16,19 @@ export default function Detail({ route, navigation }: any) {
   const { activeFluxType, setActiveFluxType, setLoadingStatus } = useContext(SessionContext);
   const [detail, setDetail] = useState<HistoryItem>();
 
-  const handleAnotherSearch = () => {
-    navigation.navigate(RoutesEnum.Search);
-  };
+  const handleHistory = () => navigation.navigate(RoutesEnum.History);
+
+  const handleHowToCompensate = () => notify("em breve...", true);
 
   const handleHowToCalculate = () => {
-    notify(`Uma somatória de valores globalmente aceitos que 
-            estão ligados a emissão de carbono presente nesse
-             item é realizada.`);
+    const title = "Como o calculo é feito";
+    const message =
+      "Uma somatória de valores globalmente aceitos que estão ligados a emissão de carbono presente nesse item é realizada.";
+
+    Alert.alert(title, message, [{ text: "OK", onPress: () => console.log("OK Pressed") }]);
   };
 
-  const handleGoToHome = () => {
-    navigation.navigate(RoutesEnum.Home);
-    setLoadingStatus(false);
-  };
+  const handleGoToHome = () => navigation.navigate(RoutesEnum.Home);
 
   const saveDetailOnHistory = async (item: HistoryItem) => {
     const key = `history-${getDateISO()}`;
@@ -132,25 +131,35 @@ export default function Detail({ route, navigation }: any) {
     <Container centralized>
       <View style={styles.resultInfo}>
         <Subtitle>{activeFluxType == "Recipe" ? "Receita" : "Produto"}</Subtitle>
-        <EmissionText value={detail?.emission ?? 0} fontSize={64} bolder />
-        <Text style={styles.frequency}>(ao ano)</Text>
+        <EmissionText value={detail?.emission ?? 0} fontSize={50} bolder />
+        <Text style={styles.frequency}>(equivalente)</Text>
         <Text style={styles.itemName}>{detail?.title}</Text>
       </View>
       <View style={styles.buttonsGrid}>
-        <Button disabled centered>
-          como posso compensar essa emissão?
-        </Button>
-        <Button onPress={handleAnotherSearch} centered>
-          pesquisar outra receita
-        </Button>
+        <View onTouchStart={handleHowToCompensate}>
+          <Button disabled centered>
+            como posso compensar essa emissão
+          </Button>
+        </View>
         <Button onPress={handleHowToCalculate}>como o cálculo é feito</Button>
-        <Button onPress={handleGoToHome}>voltar ao inicio</Button>
+        <Button onPress={handleHistory}>Histórico</Button>
+        <Button onPress={handleGoToHome}>inicio</Button>
       </View>
     </Container>
   );
 }
 
 const styles = StyleSheet.create({
+  badgeContainer: {
+    backgroundColor: "#999",
+    borderRadius: 8,
+    paddingHorizontal: 4,
+    margin: "auto 0",
+  },
+  badge: {
+    color: "#fff",
+    textTransform: "lowercase",
+  },
   resultInfo: {
     paddingTop: 24,
     width: "100%",

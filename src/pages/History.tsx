@@ -18,8 +18,12 @@ import HistoryItem from "../interfaces/HistoryItem";
 import notify from "../helpers/notify";
 import RoutesEnum from "../enums/routes";
 import HistoryService from "../services/HistoryService";
+import MinskaService from "../services/MinskaService";
+import getDateISO from "../helpers/getDateISO";
 
 export default function History({ navigation }: any) {
+  let updateItemProcess!: NodeJS.Timeout;
+  let notCalculatedItemsCheckCounter = 0;
   const NOT_SELECTED_ID = "none";
   const [data, setData] = useState<HistoryItem[]>([]);
   const [selectedItemId, setSelectedItemId] = useState<string>(NOT_SELECTED_ID);
@@ -29,11 +33,17 @@ export default function History({ navigation }: any) {
 
   const deleteSelectedItem = async () => {
     setLoadingStatus(true);
-    await HistoryService.deleteHistoryItem(selectedItemId);
-    const newData = data.filter((item) => item.id !== selectedItemId);
-    setData(newData);
-    undoSelection();
-    setLoadingStatus(false);
+    try {
+      await HistoryService.deleteHistoryItem(selectedItemId);
+      const newData = data.filter((item) => item.id !== selectedItemId);
+      setData(newData);
+      undoSelection();
+      setLoadingStatus(false);
+    } catch (error: any) {
+      console.log("[History|ERROR] deleteSelectedItem: " + error.message);
+      notify("Erro inesperado, tente novamente mais tarde.");
+      navigation.navigate();
+    }
   };
 
   const handleTrashPress = () => {
@@ -90,30 +100,85 @@ export default function History({ navigation }: any) {
     );
   };
 
-  const getList = async () => {
-    const items = await HistoryService.getHistory();
-    console.log("[History] getList: ", items);
-    if (items) setData(items);
+  const getItemEmission = async (historyItemId: string): Promise<number | null> => {
+    const defaultEmission = null;
+    let emissionToReturn: number | null = defaultEmission;
+    try {
+      const result = await MinskaService.getCalculation(historyItemId);
+      emissionToReturn = result?.totalCarbonFootprint
+        ? result?.totalCarbonFootprint
+        : defaultEmission;
+    } catch (error: any) {
+      console.log("[History|Error] getItemEmission: " + error.message);
+      notify("Erro inesperado, tente novamente mais tarde.");
+      emissionToReturn = defaultEmission;
+    }
+    updateItemBackgroundProcess(data); // Recursive call to update item each 5 minutes
+    return emissionToReturn;
+  };
 
-    // try {
-    //   const keys = await StorageService.getAllKeys();
-    //   const onlyHistoryKeys = (key: string) => key.includes("history");
-    //   const filteredKeys = keys.filter(onlyHistoryKeys);
-    //   const historyValues = await StorageService.getMultiple(filteredKeys);
-    //   const historyData = historyValues.map(([key, value]) => {
-    //     if (value) {
-    //       const item = JSON.parse(value);
-    //       item.id = key;
-    //       return item;
-    //     }
-    //   });
-    //   setData(historyData);
-    // } catch (error) {
-    //   console.error("[History|ERROR] getList: ", error);
-    //   notify("Erro inesperado, tente novamente mais tarde.");
-    //   navigation.navigate();
-    // }
-    // setLoadingStatus(false);
+  const updateEmissionById = (id: string, newEmission: number) => {
+    const newData = data.map((item) => {
+      if (item.id === id) {
+        item.emission = newEmission;
+      }
+
+      /* The await is not important in that case (updateHistoryItem) because visually the 
+      screen follows the react state called "data" to render the items */
+      HistoryService.updateHistoryItem(item);
+
+      return item;
+    });
+    if (newData.length) setData(newData);
+  };
+
+  const checkDataItemsCalculation = async (dataItems: HistoryItem[]) => {
+    const notCalculatedItems = dataItems.filter((item) => Boolean(item.emission) === false);
+
+    if (notCalculatedItems.length) {
+      notCalculatedItemsCheckCounter++;
+      updateItemBackgroundProcess(data);
+    }
+
+    for (const historyItem of notCalculatedItems) {
+      const newHistoryItemEmission = await getItemEmission(historyItem.id);
+      if (newHistoryItemEmission) {
+        updateEmissionById(historyItem.id, newHistoryItemEmission);
+      }
+    }
+  };
+
+  const updateItemBackgroundProcess = (dataItems: HistoryItem[]) => {
+    const notCalculatedItemsCheckCounterLimit = 3;
+    const delay = 5 * 1000; // 300 seconds of timeout (5 minutes)
+    // const delay = 5 * 60 * 1000; // 300 seconds of timeout (5 minutes)
+    console.log("\n[updateItemBackgroundProcess] called: " + getDateISO(), {
+      notCalculatedItemsCheckCounter,
+      notCalculatedItemsCheckCounterLimit,
+      shouldCheckCalculation: notCalculatedItemsCheckCounter <= notCalculatedItemsCheckCounterLimit,
+    });
+
+    if (notCalculatedItemsCheckCounter <= notCalculatedItemsCheckCounterLimit) {
+      const checkDataItemsCallback = () => checkDataItemsCalculation(dataItems);
+      updateItemProcess = setTimeout(checkDataItemsCallback, delay);
+    } else {
+      clearBackgroundProcess();
+    }
+  };
+
+  const getList = async () => {
+    setLoadingStatus(true);
+    try {
+      const items = await HistoryService.getHistory();
+      if (items) {
+        setData(items);
+        updateItemBackgroundProcess(items);
+      }
+    } catch (error: any) {
+      console.log("[History|ERROR] getList: " + error.message);
+      notify("Erro inesperado, tente novamente mais tarde.");
+    }
+    setLoadingStatus(false);
   };
 
   const backNavigationHandler = () => {
@@ -130,9 +195,12 @@ export default function History({ navigation }: any) {
   //   await StorageService.clear();
   // };
 
+  const clearBackgroundProcess = () => clearTimeout(updateItemProcess);
+
   useEffect(() => {
     // wipeData();
     getList();
+    return clearBackgroundProcess;
   }, []);
 
   return (

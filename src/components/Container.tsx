@@ -1,5 +1,4 @@
 import React from "react";
-
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Loading from "./Loading";
@@ -18,9 +17,7 @@ export default class Container extends React.Component<ContainerProps> {
 
     return (
       <Loading>
-        <SafeAreaView
-          style={centralized ? styles.centralizedContainer : styles.container}
-        >
+        <SafeAreaView style={centralized ? styles.centralizedContainer : styles.container}>
           {children}
         </SafeAreaView>
       </Loading>

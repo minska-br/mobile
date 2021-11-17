@@ -1,9 +1,10 @@
 enum RoutesEnum {
   Home = "Home",
   Search = "Search",
-  ResultList = "ResultList",
-  ResultDetail = "ResultDetail",
+  SearchResult = "SearchResult",
+  Detail = "Detail",
   History = "History",
+  CalculatingEmptyState = "CalculatingEmptyState",
 }
 
 export default RoutesEnum;

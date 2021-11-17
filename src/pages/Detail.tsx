@@ -1,29 +1,23 @@
-import React, { useContext } from "react";
-import { useEffect } from "react";
-import { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Button from "../components/Button";
 import Container from "../components/Container";
 import EmissionText from "../components/EmissionText";
 import Subtitle from "../components/Subtitle";
-import { LoadingContext } from "../contexts/LoadingContext";
+import { SessionContext } from "../contexts/SessionContext";
 import RoutesEnum from "../enums/routes";
 import getDateISO from "../helpers/getDateISO";
 import notify from "../helpers/notify";
-import randomIntFromInterval from "../helpers/randomIntFromInterval";
 import HistoryItem from "../interfaces/HistoryItem";
-import MinskaApi from "../services/MinskaApi";
-import StorageService from "../services/StorageService";
+import MinskaService from "../services/MinskaService";
 import ActiveFluxType from "../types/ActiveFluxType";
 
-export default function ResultDetail({ route, navigation }: any) {
-  const { setLoadingStatus } = useContext(LoadingContext);
+export default function Detail({ route, navigation }: any) {
+  const { activeFluxType, setActiveFluxType, setLoadingStatus } = useContext(SessionContext);
   const [detail, setDetail] = useState<HistoryItem>();
-  const activeFluxType: ActiveFluxType = route.params?.activeFluxType;
-  const seachItem = route.params?.seachItem;
 
   const handleAnotherSearch = () => {
-    navigation.navigate(RoutesEnum.Search, { activeFluxType });
+    navigation.navigate(RoutesEnum.Search);
   };
 
   const handleHowToCalculate = () => {
@@ -39,43 +33,67 @@ export default function ResultDetail({ route, navigation }: any) {
 
   const saveDetailOnHistory = async (item: HistoryItem) => {
     const key = `history-${getDateISO()}`;
-    console.log("[ResultDetail] saveDetailOnHistory:", key);
+    console.log("\n[Detail] saveDetailOnHistory:", key);
     try {
-      await StorageService.setObjectItem(key, item);
-    } catch (error) {
-      console.log("[ResultDetail|ERROR] saveDetailOnHistory: ", error);
+      // await StorageService.setObjectItem(key, item);
+    } catch (error: any) {
+      console.log("\n[Detail|ERROR] saveDetailOnHistory: ", error);
     }
   };
 
   const getCalculation = async (activeFluxType: ActiveFluxType) => {
-    try {
-      console.log("[ResultDetail] getCalculation: ", seachItem);
+    console.log("\n[Detail] getCalculation: ", route.params);
+    const detailItem = route.params?.detailItem;
 
-      const { id, name } = seachItem;
-      const type: ActiveFluxType = activeFluxType === "Recipe" ? "Recipe" : "Product";
-      const responseCalculation = await MinskaApi.startCalculation(id, name, type);
-      const { calculationId } = responseCalculation.data;
-      const { data } = responseCalculation;
+    // const calculationId = route.params?.calculationId;
+    // if (calculationId) {
+    //   setDetailByCalculationId(calculationId);
+    // }
+    setLoadingStatus(false);
 
-      console.log("[ResultDetail] getDetail(responseCalculation): ", { data });
-      const responseResult = await MinskaApi.getCalculationResult(calculationId);
+    // try {
+    // const { id, name } = seachItem;
+    // const type = activeFluxType === "Recipe" ? "recipe" : "product";
+    // const responseCalculation = await MinskaApi.startCalculation(id, name, type);
+    // const { calculationId } = responseCalculation.data;
+    // const { data } = responseCalculation;
 
-      console.log("[ResultDetail] getDetail(responseResult): ", { data: responseResult.data });
-      const resultData = responseResult.data;
+    // console.log("\nDetail] getDetail(responseCalculation): ", { data });
+    // const responseResult = await MinskaApi.getCalculationResult(calculationId);
 
-      const detail: HistoryItem = {
-        id,
-        title: name,
-        emission: resultData.totalCarbonFootprint,
-        type,
+    // console.log("\nDetail] getDetail(responseResult): ", { data: responseResult.data });
+    // const resultData = responseResult.data;
+
+    // const detail: HistoryItem = {
+    //   id,
+    //   title: name,
+    //   emission: resultData.totalCarbonFootprint,
+    //   type,
+    //   dateISO: getDateISO(),
+    // };
+    // setDetail(detail);
+    // saveDetailOnHistory(detail);
+    // } catch (error: any) {
+    //   console.log("\nDetail|ERROR]: ", error);
+    //   notify("Erro inesperado, tente novamente mais tarde.");
+    //   navigation.navigate(RoutesEnum.Home);
+    // }
+  };
+
+  const setDetailByCalculationId = async (calculationId: string) => {
+    const calculation = await MinskaService.getCalculation(calculationId);
+    console.log("\n[Detail] getCalculation(calculation): ", calculation);
+    if (calculation) {
+      const newDetail: HistoryItem = {
         dateISO: getDateISO(),
+        emission: calculation.totalCarbonFootprint,
+        id: calculationId,
+        title: calculation.name,
+        type: calculation.processes.length === 1 ? "Product" : "Recipe",
       };
-      setDetail(detail);
-      saveDetailOnHistory(detail);
-    } catch (error) {
-      console.error("[ResultDetail|ERROR]: ", error);
-      notify("Erro inesperado, tente novamente mais tarde.");
-      navigation.navigate(RoutesEnum.Home);
+      console.log("\n[Detail] getCalculation(newDetail): ", newDetail);
+
+      setDetail(newDetail);
     }
   };
 
@@ -91,13 +109,17 @@ export default function ResultDetail({ route, navigation }: any) {
     setDetail(detail);
   };
 
-  const getDetail = async () => {
+  const getDetail = () => {
     setLoadingStatus(true);
+    console.log("\n[Detail] getDetail: ", { activeFluxType });
+    const detailItem: HistoryItem = route.params?.detailItem;
 
-    if (activeFluxType) await getCalculation(activeFluxType);
-    else mockedSetup();
-
-    setLoadingStatus(false);
+    if (detailItem) {
+      console.log("\n[Detail] getDetail: ", { detailItem });
+      setActiveFluxType(detailItem.type);
+      setDetail(detailItem);
+      setLoadingStatus(false);
+    } else mockedSetup();
   };
 
   const loadDetail = () => {
@@ -109,7 +131,7 @@ export default function ResultDetail({ route, navigation }: any) {
   return (
     <Container centralized>
       <View style={styles.resultInfo}>
-        <Subtitle route={route} />
+        <Subtitle>{activeFluxType == "Recipe" ? "Receita" : "Produto"}</Subtitle>
         <EmissionText value={detail?.emission ?? 0} fontSize={64} bolder />
         <Text style={styles.frequency}>(ao ano)</Text>
         <Text style={styles.itemName}>{detail?.title}</Text>

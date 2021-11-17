@@ -1,21 +1,29 @@
-import React from "react";
-import { useState } from "react";
+import React, { useEffect } from "react";
+import { useContext } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Button from "../components/Button";
 import Container from "../components/Container";
 import Title from "../components/Title";
+import { SessionContext } from "../contexts/SessionContext";
 import RoutesEnum from "../enums/routes";
-import notify from "../helpers/notify";
 import ActiveFluxType from "../types/ActiveFluxType";
 
 export default function Home({ navigation }: any) {
-  const handleHistoryPress = () => {
-    navigation.navigate(RoutesEnum.History);
-  };
+  const { setActiveFluxType, setLoadingStatus } = useContext(SessionContext);
+
+  const handleHistoryPress = () => navigation.navigate(RoutesEnum.History);
 
   const handleFluxPress = (activeFluxType: ActiveFluxType) => {
-    navigation.navigate(RoutesEnum.Search, { activeFluxType });
+    setActiveFluxType(activeFluxType);
+    navigation.navigate(RoutesEnum.Search);
   };
+
+  const setInitialSessionParameter = () => {
+    setActiveFluxType(null);
+    setLoadingStatus(false);
+  };
+
+  useEffect(setInitialSessionParameter, []);
 
   return (
     <Container centralized>

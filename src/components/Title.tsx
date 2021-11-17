@@ -1,11 +1,5 @@
 import React from "react";
-
-import {
-  GestureResponderEvent,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, Text } from "react-native";
 
 interface TitleProps {
   centralized?: boolean;
@@ -19,11 +13,7 @@ export default class Title extends React.Component<TitleProps> {
   render() {
     const { centralized, children } = this.props;
 
-    return (
-      <Text style={centralized ? styles.centeredTitle : styles.title}>
-        {children}
-      </Text>
-    );
+    return <Text style={centralized ? styles.centeredTitle : styles.title}>{children}</Text>;
   }
 }
 

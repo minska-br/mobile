@@ -1,52 +1,73 @@
 import React, { useContext, useEffect } from "react";
 import { useState } from "react";
-import { FlatList, StyleSheet, TouchableOpacity, Text, View, Alert } from "react-native";
+import {
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  View,
+  Alert,
+  BackHandler,
+} from "react-native";
 import Container from "../components/Container";
 import Title from "../components/Title";
-import { LoadingContext } from "../contexts/LoadingContext";
+import { SessionContext } from "../contexts/SessionContext";
 import { Ionicons } from "@expo/vector-icons";
 import EmissionText from "../components/EmissionText";
-import StorageService from "../services/StorageService";
 import HistoryItem from "../interfaces/HistoryItem";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import notify from "../helpers/notify";
+import RoutesEnum from "../enums/routes";
+import HistoryService from "../services/HistoryService";
+import MinskaService from "../services/MinskaService";
+import getDateISO from "../helpers/getDateISO";
 
 export default function History({ navigation }: any) {
+  let updateItemProcess!: NodeJS.Timeout;
+  let notCalculatedItemsCheckCounter = 0;
   const NOT_SELECTED_ID = "none";
   const [data, setData] = useState<HistoryItem[]>([]);
-  const [hasItems, setHasItems] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState<string>(NOT_SELECTED_ID);
-  const { setLoadingStatus } = useContext(LoadingContext);
+  const { setLoadingStatus } = useContext(SessionContext);
 
   const undoSelection = () => setSelectedItemId(NOT_SELECTED_ID);
 
   const deleteSelectedItem = async () => {
     setLoadingStatus(true);
-    await StorageService.deleteItem(selectedItemId);
-    const newData = data.filter((item) => item.id !== selectedItemId);
-    setData(newData);
-    undoSelection();
-    setLoadingStatus(false);
+    try {
+      await HistoryService.deleteHistoryItem(selectedItemId);
+      const newData = data.filter((item) => item.id !== selectedItemId);
+      setData(newData);
+      undoSelection();
+      setLoadingStatus(false);
+    } catch (error: any) {
+      console.log("\nHistory|ERROR] deleteSelectedItem: " + error.message);
+      notify("Erro inesperado, tente novamente mais tarde.");
+      navigation.navigate(RoutesEnum.Home);
+    }
   };
 
   const handleTrashPress = () => {
     const selectedItem = data.find((item) => item.id === selectedItemId);
     const itemName = selectedItem?.title ?? "";
-    const type = selectedItem?.type === "Product" ? "e produto" : "a receita";
+    const itemType = selectedItem?.type === "Product" ? "e produto" : "a receita";
 
     Alert.alert(
       itemName,
-      `Deseja mesmo excluir ess${type}?`,
+      `Deseja mesmo excluir ess${itemType}?`,
       [
-        {
-          text: "Não",
-          onPress: () => {},
-          style: "cancel",
-        },
+        { text: "Não", onPress: () => {}, style: "cancel" },
         { text: "Sim", onPress: deleteSelectedItem },
       ],
       { cancelable: false }
     );
+  };
+
+  const handleDetailPress = () => {
+    const selectedItem = data.find((item) => item.id === selectedItemId);
+    console.log("\n[History] handleDetailPress: ", selectedItem);
+
+    const params = { detailItem: selectedItem };
+    navigation.navigate(RoutesEnum.Detail, params);
   };
 
   const renderItem = ({ item }: any) => {
@@ -73,49 +94,129 @@ export default function History({ navigation }: any) {
           <Text style={[styles.itemText, activeTextStyle]}>
             {item.title.length > 15 ? item.title?.substring(0, 15).trim() + "..." : item.title}
           </Text>
-          <EmissionText
-            value={item?.emission ?? 0}
-            fontSize={20}
-            color={isSelected ? "#fff" : undefined}
-          />
+          {item.emission == null ? (
+            <Text style={styles.itemType}>Calculando...</Text>
+          ) : (
+            <EmissionText
+              value={item?.emission ?? 0}
+              fontSize={20}
+              color={isSelected ? "#fff" : undefined}
+            />
+          )}
         </View>
       </TouchableOpacity>
     );
   };
 
-  const getList = async () => {
+  const getItemEmission = async (historyItemId: string): Promise<number | null> => {
+    const defaultEmission = null;
+    let emissionToReturn: number | null = defaultEmission;
     try {
-      const keys = await StorageService.getAllKeys();
-      const onlyHistoryKeys = (key: string) => key.includes("history");
-      const filteredKeys = keys.filter(onlyHistoryKeys);
-      const historyValues = await StorageService.getMultiple(filteredKeys);
-      const historyData = historyValues.map(([key, value]) => {
-        if (value) {
-          const item = JSON.parse(value);
-          item.id = key;
-          return item;
-        }
-      });
-      setData(historyData);
-    } catch (error) {
-      console.error("[History|ERROR] getList: ", error);
+      const result = await MinskaService.getCalculation(historyItemId);
+      emissionToReturn = result?.totalCarbonFootprint
+        ? result?.totalCarbonFootprint
+        : defaultEmission;
+    } catch (error: any) {
+      console.log("\nHistory|Error] getItemEmission: " + error.message);
       notify("Erro inesperado, tente novamente mais tarde.");
-      navigation.navigate();
+      emissionToReturn = defaultEmission;
+    }
+    updateItemBackgroundProcess(data); // Recursive call to update item each 5 minutes
+    return emissionToReturn;
+  };
+
+  const updateEmissionById = (id: string, newEmission: number) => {
+    const newData = data.map((item) => {
+      if (item.id === id) {
+        item.emission = newEmission;
+      }
+
+      /* The await is not important in that case (updateHistoryItem) because visually the 
+      screen follows the react state called "data" to render the items */
+      HistoryService.updateHistoryItem(item);
+
+      return item;
+    });
+    if (newData.length) setData(newData);
+  };
+
+  const checkDataItemsCalculation = async (dataItems: HistoryItem[]) => {
+    const notCalculatedItems = dataItems.filter((item) => Boolean(item.emission) === false);
+
+    if (notCalculatedItems.length) {
+      notCalculatedItemsCheckCounter++;
+      updateItemBackgroundProcess(data);
+    }
+
+    for (const historyItem of notCalculatedItems) {
+      const newHistoryItemEmission = await getItemEmission(historyItem.id);
+      if (newHistoryItemEmission) {
+        updateEmissionById(historyItem.id, newHistoryItemEmission);
+      }
+    }
+  };
+
+  const updateItemBackgroundProcess = (dataItems: HistoryItem[]) => {
+    const notCalculatedItemsCheckCounterLimit = 3;
+    const delay = 5 * 1000; // 300 seconds of timeout (5 minutes)
+    // const delay = 5 * 60 * 1000; // 300 seconds of timeout (5 minutes)
+    console.log("\n[updateItemBackgroundProcess] called: " + getDateISO(), {
+      notCalculatedItemsCheckCounter,
+      notCalculatedItemsCheckCounterLimit,
+      shouldCheckCalculation: notCalculatedItemsCheckCounter <= notCalculatedItemsCheckCounterLimit,
+    });
+
+    if (notCalculatedItemsCheckCounter <= notCalculatedItemsCheckCounterLimit) {
+      const checkDataItemsCallback = () => checkDataItemsCalculation(dataItems);
+      updateItemProcess = setTimeout(checkDataItemsCallback, delay);
+    } else {
+      clearBackgroundProcess();
+    }
+  };
+
+  const getList = async () => {
+    setLoadingStatus(true);
+    try {
+      const items = await HistoryService.getHistory();
+      if (items) {
+        setData(items);
+        console.log("\n[History] getList(items): ", items);
+        updateItemBackgroundProcess(items);
+      }
+    } catch (error: any) {
+      console.log("\nHistory|ERROR] getList: " + error.message);
+      notify("Erro inesperado, tente novamente mais tarde.");
     }
     setLoadingStatus(false);
   };
 
-  const loadList = () => {
-    // AsyncStorage.clear();
-    getList();
+  const backNavigationHandler = () => {
+    navigation.navigate(RoutesEnum.Home);
+    return true; // Just to use as back click without type problems
   };
 
-  useEffect(loadList, []);
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", backNavigationHandler);
+    return () => backHandler.remove();
+  }, []);
+
+  // const wipeData = async () => {
+  //   await StorageService.clear();
+  // };
+
+  const clearBackgroundProcess = () => clearTimeout(updateItemProcess);
+
+  useEffect(() => {
+    // wipeData();
+    getList();
+    return clearBackgroundProcess;
+  }, []);
 
   return (
     <Container>
       <View style={styles.titleContainer}>
         <Title>Histórico</Title>
+
         <Text style={styles.historySubtitle}>
           {data.length
             ? "Selecione um item caso queira o excluir:"
@@ -126,10 +227,18 @@ export default function History({ navigation }: any) {
       <FlatList data={data} renderItem={renderItem} keyExtractor={(item) => item.id.toString()} />
 
       {selectedItemId !== NOT_SELECTED_ID && (
-        <View style={styles.trashButtonContainer}>
-          <TouchableOpacity style={styles.trashButton} onPress={handleTrashPress}>
-            <Ionicons name="md-trash-outline" color="white" size={30} />
-          </TouchableOpacity>
+        <View style={styles.bottomButtonsGroup}>
+          <View style={styles.trashButtonContainer}>
+            <TouchableOpacity style={styles.trashButton} onPress={handleTrashPress}>
+              <Ionicons name="md-trash-outline" color="white" size={30} />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.detailButtonContainer}>
+            <TouchableOpacity style={styles.trashButton} onPress={handleDetailPress}>
+              <Ionicons name="md-eye-outline" color="white" size={30} />
+            </TouchableOpacity>
+          </View>
         </View>
       )}
     </Container>
@@ -169,7 +278,23 @@ const styles = StyleSheet.create({
   trashButtonContainer: {
     flexDirection: "row-reverse",
   },
+  bottomButtonsGroup: {
+    display: "flex",
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
   trashButton: {
+    backgroundColor: "#444",
+    width: 48,
+    height: 48,
+    padding: 8,
+    borderRadius: 8,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  detailButtonContainer: {
     backgroundColor: "#444",
     width: 48,
     height: 48,

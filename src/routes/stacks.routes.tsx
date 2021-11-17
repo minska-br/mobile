@@ -3,23 +3,22 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Home from "../pages/Home";
 import Search from "../pages/Search";
 import RoutesEnum from "../enums/routes";
-import ResultList from "../pages/ResultList";
-import ResultDetail from "../pages/ResultDetail";
+import SearchResult from "../pages/SearchResult";
+import Detail from "../pages/Detail";
 import History from "../pages/History";
+import CalculatingEmptyState from "../pages/CalculatingEmptyState";
 
 const Stack = createNativeStackNavigator();
 
 const AppRoutes: React.FC = () => {
   return (
-    <Stack.Navigator
-      initialRouteName={RoutesEnum.Home}
-      screenOptions={{ headerShown: false }}
-    >
+    <Stack.Navigator initialRouteName={RoutesEnum.Home} screenOptions={{ headerShown: false }}>
       <Stack.Screen name={RoutesEnum.Home} component={Home} />
       <Stack.Screen name={RoutesEnum.Search} component={Search} />
-      <Stack.Screen name={RoutesEnum.ResultList} component={ResultList} />
-      <Stack.Screen name={RoutesEnum.ResultDetail} component={ResultDetail} />
+      <Stack.Screen name={RoutesEnum.SearchResult} component={SearchResult} />
+      <Stack.Screen name={RoutesEnum.Detail} component={Detail} />
       <Stack.Screen name={RoutesEnum.History} component={History} />
+      <Stack.Screen name={RoutesEnum.CalculatingEmptyState} component={CalculatingEmptyState} />
     </Stack.Navigator>
   );
 };

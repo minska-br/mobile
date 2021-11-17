@@ -42,8 +42,9 @@ export default class HistoryService {
     await AsyncStorage.setItem(this.getKey(key), JSON.stringify(obj));
   };
 
-  static deleteItem = async (key: string) => {
-    logging("deleteItem", { key });
+  static deleteHistoryItem = async (historyItemId: string) => {
+    const key = this.getKey(historyItemId);
+    logging("deleteHistoryItem", { key });
     await AsyncStorage.removeItem(key);
   };
 }

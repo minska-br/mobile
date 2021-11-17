@@ -14,7 +14,6 @@ import Title from "../components/Title";
 import { SessionContext } from "../contexts/SessionContext";
 import { Ionicons } from "@expo/vector-icons";
 import EmissionText from "../components/EmissionText";
-import StorageService from "../services/HistoryService";
 import HistoryItem from "../interfaces/HistoryItem";
 import notify from "../helpers/notify";
 import RoutesEnum from "../enums/routes";
@@ -30,7 +29,7 @@ export default function History({ navigation }: any) {
 
   const deleteSelectedItem = async () => {
     setLoadingStatus(true);
-    await StorageService.deleteItem(selectedItemId);
+    await HistoryService.deleteHistoryItem(selectedItemId);
     const newData = data.filter((item) => item.id !== selectedItemId);
     setData(newData);
     undoSelection();
@@ -40,17 +39,13 @@ export default function History({ navigation }: any) {
   const handleTrashPress = () => {
     const selectedItem = data.find((item) => item.id === selectedItemId);
     const itemName = selectedItem?.title ?? "";
-    const type = selectedItem?.type === "Product" ? "e produto" : "a receita";
+    const itemType = selectedItem?.type === "Product" ? "e produto" : "a receita";
 
     Alert.alert(
       itemName,
-      `Deseja mesmo excluir ess${type}?`,
+      `Deseja mesmo excluir ess${itemType}?`,
       [
-        {
-          text: "Não",
-          onPress: () => {},
-          style: "cancel",
-        },
+        { text: "Não", onPress: () => {}, style: "cancel" },
         { text: "Sim", onPress: deleteSelectedItem },
       ],
       { cancelable: false }

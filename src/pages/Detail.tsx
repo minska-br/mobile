@@ -131,7 +131,7 @@ export default function Detail({ route, navigation }: any) {
     <Container centralized>
       <View style={styles.resultInfo}>
         <Subtitle>{activeFluxType == "Recipe" ? "Receita" : "Produto"}</Subtitle>
-        <EmissionText value={detail?.emission ?? 0} fontSize={50} bolder />
+        <EmissionText value={detail?.emission ?? 0} fontSize={50} bolder separateValueAndUnit />
         <Text style={styles.frequency}>(equivalente)</Text>
         <Text style={styles.itemName}>{detail?.title}</Text>
       </View>

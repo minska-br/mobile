@@ -100,6 +100,7 @@ export default function History({ navigation }: any) {
             <EmissionText
               value={item?.emission ?? 0}
               fontSize={20}
+              decimalPlaces={2}
               color={isSelected ? "#fff" : undefined}
             />
           )}
@@ -196,6 +197,7 @@ export default function History({ navigation }: any) {
   };
 
   useEffect(() => {
+    setSelectedItemId(NOT_SELECTED_ID);
     const backHandler = BackHandler.addEventListener("hardwareBackPress", backNavigationHandler);
     return () => backHandler.remove();
   }, []);

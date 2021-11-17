@@ -16,7 +16,7 @@ export default class EmissionText extends React.Component<EmissionTextProps> {
     super(props);
   }
 
-  formatValue = (value: number) => value.toFixed(1).toString().replace(".", ",");
+  formatValue = (value: number) => value.toFixed(2).toString().replace(".", ",");
 
   render() {
     const value = this.formatValue(this.props.value);
@@ -27,7 +27,7 @@ export default class EmissionText extends React.Component<EmissionTextProps> {
 
     return (
       <Text style={[styles.emissionText, { color, fontWeight, fontSize }]}>
-        {value} tCO
+        {value} Kg CO
         <Text style={[styles.emissionText, { color, fontWeight, fontSize: subcribedFontSize }]}>
           2
         </Text>

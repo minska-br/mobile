@@ -18,9 +18,12 @@ export default function Home({ navigation }: any) {
     navigation.navigate(RoutesEnum.Search);
   };
 
-  const disableLoading = () => setLoadingStatus(false);
+  const setInitialSessionParameter = () => {
+    setActiveFluxType(null);
+    setLoadingStatus(false);
+  };
 
-  useEffect(disableLoading, []);
+  useEffect(setInitialSessionParameter, []);
 
   return (
     <Container centralized>

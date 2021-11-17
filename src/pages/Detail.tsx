@@ -37,8 +37,8 @@ export default function Detail({ route, navigation }: any) {
     const key = `history-${getDateISO()}`;
     console.log("\n[Detail] saveDetailOnHistory:", key);
     try {
-      await StorageService.setObjectItem(key, item);
-    } catch (error) {
+      // await StorageService.setObjectItem(key, item);
+    } catch (error: any) {
       console.log("\n[Detail|ERROR] saveDetailOnHistory: ", error);
     }
   };
@@ -60,10 +60,10 @@ export default function Detail({ route, navigation }: any) {
     // const { calculationId } = responseCalculation.data;
     // const { data } = responseCalculation;
 
-    // console.log("[Detail] getDetail(responseCalculation): ", { data });
+    // console.log("\nDetail] getDetail(responseCalculation): ", { data });
     // const responseResult = await MinskaApi.getCalculationResult(calculationId);
 
-    // console.log("[Detail] getDetail(responseResult): ", { data: responseResult.data });
+    // console.log("\nDetail] getDetail(responseResult): ", { data: responseResult.data });
     // const resultData = responseResult.data;
 
     // const detail: HistoryItem = {
@@ -75,8 +75,8 @@ export default function Detail({ route, navigation }: any) {
     // };
     // setDetail(detail);
     // saveDetailOnHistory(detail);
-    // } catch (error) {
-    //   console.error("[Detail|ERROR]: ", error);
+    // } catch (error: any) {
+    //   console.log("\nDetail|ERROR]: ", error);
     //   notify("Erro inesperado, tente novamente mais tarde.");
     //   navigation.navigate(RoutesEnum.Home);
     // }

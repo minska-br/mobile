@@ -54,7 +54,7 @@ export default function Search({ navigation }: any) {
       navigation.navigate(RoutesEnum.SearchResult, params);
     } catch (error: any) {
       notify("Erro inesperado, tente novamente mais tarde");
-      console.log("[Search | ERROR] scheduleProductCalculation : " + error.message);
+      console.log("\nSearch | ERROR] scheduleProductCalculation : " + error.message);
       navigation.navigate(RoutesEnum.Home);
     }
   };
@@ -75,7 +75,7 @@ export default function Search({ navigation }: any) {
       navigation.navigate(RoutesEnum.CalculatingEmptyState);
     } catch (error: any) {
       notify("Erro inesperado, tente novamente mais tarde");
-      console.log("[Search] scheduleProductCalculation | ERROR: " + error.message);
+      console.log("\nSearch] scheduleProductCalculation | ERROR: " + error.message);
       navigation.navigate(RoutesEnum.Home);
     }
   };

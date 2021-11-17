@@ -40,7 +40,7 @@ export default function History({ navigation }: any) {
       undoSelection();
       setLoadingStatus(false);
     } catch (error: any) {
-      console.log("[History|ERROR] deleteSelectedItem: " + error.message);
+      console.log("\nHistory|ERROR] deleteSelectedItem: " + error.message);
       notify("Erro inesperado, tente novamente mais tarde.");
       navigation.navigate();
     }
@@ -109,7 +109,7 @@ export default function History({ navigation }: any) {
         ? result?.totalCarbonFootprint
         : defaultEmission;
     } catch (error: any) {
-      console.log("[History|Error] getItemEmission: " + error.message);
+      console.log("\nHistory|Error] getItemEmission: " + error.message);
       notify("Erro inesperado, tente novamente mais tarde.");
       emissionToReturn = defaultEmission;
     }
@@ -172,10 +172,11 @@ export default function History({ navigation }: any) {
       const items = await HistoryService.getHistory();
       if (items) {
         setData(items);
+        console.log("\n[History] getList(items): ", items);
         updateItemBackgroundProcess(items);
       }
     } catch (error: any) {
-      console.log("[History|ERROR] getList: " + error.message);
+      console.log("\nHistory|ERROR] getList: " + error.message);
       notify("Erro inesperado, tente novamente mais tarde.");
     }
     setLoadingStatus(false);

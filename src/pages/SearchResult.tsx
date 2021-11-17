@@ -33,7 +33,7 @@ export default function SearchResult({ route, navigation }: any) {
       navigation.navigate(RoutesEnum.CalculatingEmptyState);
     } catch (error: any) {
       notify("Erro inesperado, tente novamente mais tarde");
-      console.log("[SearchResult | ERROR] scheduleRecipeCalculation: " + error.message);
+      console.log("\nSearchResult | ERROR] scheduleRecipeCalculation: " + error.message);
       navigation.navigate(RoutesEnum.Home);
     }
   };

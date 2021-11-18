@@ -76,10 +76,14 @@ export default function History({ navigation }: any) {
     const activeTextStyle = isSelected ? styles.activeItemText : null;
 
     const onPressItem = (id: string) => {
-      // setLoadingStatus(true);
-      const newId = isSelected ? NOT_SELECTED_ID : id; // Unselect id on twice press
-      setSelectedItemId(newId);
-      // fakeDelay(() => setLoadingStatus(false), 10, 5);
+      if (item.emission) {
+        // setLoadingStatus(true);
+        const newId = isSelected ? NOT_SELECTED_ID : id; // Unselect id on twice press
+        setSelectedItemId(newId);
+        // fakeDelay(() => setLoadingStatus(false), 10, 5);
+      } else {
+        notify("Calculo em andamento.");
+      }
     };
 
     return (
@@ -221,7 +225,7 @@ export default function History({ navigation }: any) {
 
         <Text style={styles.historySubtitle}>
           {data.length
-            ? "Selecione um item caso queira o excluir:"
+            ? "Selecione um item caso queira ver mais detalhes ou excluí-lo:"
             : "Ainda não existem itens no seu histórico."}
         </Text>
       </View>
